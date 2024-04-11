@@ -43,9 +43,14 @@
 
         <!-- Start project mode -->
         <a-entity id="projectCard" visible="false" position="-1 1.6 -1">
-            <a-entity  class="clickable"  id="project1" project-click geometry="primitive: plane; width: 1; height: 0.2" material="color: #fff"
-            position="0 0.3 0" text="value: Falling Ball; align: center; color: #000">
-        </a-entity>
+            <a-entity class="clickable" id="project1" project-click geometry="primitive: plane; width: 1; height: 0.2"
+                material="color: #fff" position="0 0.3 0" text="value: Falling Ball; align: center; color: #000"
+                link="href: /example/fallingball"
+                >
+            </a-entity>
+            <a-entity class="clickable" id="project2" project-click geometry="primitive: plane; width: 1; height: 0.2"
+                material="color: #fff" position="0 0.1 0" text="value: Dice Tower; align: center; color: #000"
+                link="href: /example/dicetower"></a-entity>
         </a-entity>
 
         <!-- end project mode -->

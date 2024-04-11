@@ -1,7 +1,8 @@
 AFRAME.registerComponent('project-click', {
     init: function () {
         this.el.addEventListener('click', function (evt) {
-            window.location.href = '/example/fallingball';
+            const url = this.el.getAttribute('link').href;
+            window.location.href = url;
         });
     }
 });
