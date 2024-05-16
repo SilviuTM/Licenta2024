@@ -53,6 +53,8 @@ function placeShape() {
   }
 }
 
-document.querySelector('a-scene').addEventListener('click', function () {
+document.querySelector('a-scene').addEventListener('contextmenu', function (e) {
+  e.preventDefault();
+  e.stopPropagation();
   placeShape();
 });
