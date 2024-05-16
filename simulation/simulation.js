@@ -25,13 +25,16 @@ function placeShape() {
       shapeEl.setAttribute('width', 1);
       shapeEl.setAttribute('height', 1);
       shapeEl.setAttribute('depth', 1);
+      intersection.point.z += 0.5;
     } else if (currentShape === 'sphere') {
       shapeEl = document.createElement('a-sphere');
       shapeEl.setAttribute('radius', 0.5);
+      intersection.point.z += 0.5;
     } else if (currentShape === 'cylinder') {
       shapeEl = document.createElement('a-cylinder');
       shapeEl.setAttribute('radius', 0.5);
       shapeEl.setAttribute('height', 1);
+      intersection.point.z += 0.5;
     }
 
     shapeEl.setAttribute('position', intersection.point);
