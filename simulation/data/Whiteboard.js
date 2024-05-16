@@ -56,8 +56,19 @@ class Whiteboard {
       const boardWidth = Number.parseFloat(this.htmlElement.getAttribute('width'));
       const boardHeight = Number.parseFloat(this.htmlElement.getAttribute('height'));
       intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth'));
-      intersection.point.x = Number.parseInt(intersection.point.x * 10000 / this.tileSize / 10000) * this.tileSize;
-      intersection.point.y = Number.parseInt(intersection.point.y * 10000 / this.tileSize / 10000) * this.tileSize;
+
+      let deltaX = boardWidth / 2;
+      while (deltaX > intersection.point.x) deltaX -= this.tileSize;
+      deltaX = deltaX - intersection.point.x + this.tileSize / 2;
+      intersection.point.x += deltaX;
+
+      let deltaY = -boardHeight / 2;
+      while (deltaY < intersection.point.y) deltaY += this.tileSize;
+      deltaY = deltaY - intersection.point.y - this.tileSize / 2;
+      intersection.point.y += deltaY;
+
+      // intersection.point.x = Number.parseInt(intersection.point.x * 10000 / this.tileSize / 10000) * this.tileSize;
+      // intersection.point.y = Number.parseInt(intersection.point.y * 10000 / this.tileSize / 10000) * this.tileSize;
       const shapeEl = CircuitElementFactory.getShape(this.currentShape, intersection.point, this.tileSize);
       if (isShadow) {
         shapeEl.setShadow();
