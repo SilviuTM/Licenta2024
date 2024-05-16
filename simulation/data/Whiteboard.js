@@ -48,7 +48,25 @@ class Whiteboard {
     this.currentShape = shape;
   }
 
-  placeShape() {
+  #getShapeEl({isShadow = false}) {
+    const cursorEl = document.querySelector('#cursor');
+    const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+    if (intersection) {
+      // in caz ca va fi vreodata nevoie de hitbox cu alt format decat 1:1
+      const boardWidth = Number.parseFloat(this.htmlElement.getAttribute('width'));
+      const boardHeight = Number.parseFloat(this.htmlElement.getAttribute('height'));
+      intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth'));
+      intersection.point.x = Number.parseInt(intersection.point.x * 10000 / this.tileSize / 10000) * this.tileSize;
+      intersection.point.y = Number.parseInt(intersection.point.y * 10000 / this.tileSize / 10000) * this.tileSize;
+      const shapeEl = CircuitElementFactory.getShape(this.currentShape, intersection.point, this.tileSize);
+      if (isShadow) {
+        shapeEl.setShadow();
+      }
+      return shapeEl;
+    }
+  }
+
+  placeShadowShape() {
     if (this.currentShape === 'none')
       return;
 
@@ -57,20 +75,25 @@ class Whiteboard {
       return;
     }
 
+    const shadowElts = document.querySelectorAll('.shadow');
+    shadowElts.forEach((elt) => {
+      elt.parentNode.removeChild(elt);
+    });
     const sceneEl = document.querySelector('a-scene');
-    const cursorEl = document.querySelector('#cursor');
-    const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
-    console.log(intersection.object.el);
-    if (intersection) {
-      // in caz ca va fi vreodata nevoie de hitbox cu alt format decat 1:1
-      const boardWidth = Number.parseFloat(this.htmlElement.getAttribute('width'));
-      const boardHeight = Number.parseFloat(this.htmlElement.getAttribute('height'));
-      intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth'));
-      intersection.point.x = Number.parseInt(intersection.point.x * 10000 / this.tileSize / 10000)  * this.tileSize; 
-      intersection.point.y = Number.parseInt(intersection.point.y * 10000 / this.tileSize / 10000)  * this.tileSize; 
-      const shapeEl = CircuitElementFactory.getShape(this.currentShape, intersection.point, this.tileSize);
-      sceneEl.appendChild(shapeEl.getHtmlElement());
-      console.log(shapeEl.getHtmlElement());
+    const shapeEl = this.#getShapeEl({isShadow: true});
+    sceneEl.appendChild(shapeEl.getHtmlElement());
+  }
+
+  placeShape() {
+    if (this.currentShape === 'none')
+      return;
+
+    if (this.currentShape === 'delete') {
+      this.#handleDelete();
+      return;
     }
+    const sceneEl = document.querySelector('a-scene');
+    const shapeEl = this.#getShapeEl();
+    sceneEl.appendChild(shapeEl.getHtmlElement());
   }
 }

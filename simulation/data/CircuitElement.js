@@ -10,28 +10,44 @@ class Position {
 
 
 class CircuitElement {
-    constructor(p, img, type, color, classes, onclick) {
+    constructor(p, img, type, color, classes) {
         this.position = p;
         this.img = img;
         this.type = type;
         this.color = color;
         this.classes = classes;
-        this.onclick = onclick;
         this.bodyType = 'dynamic-body';
+        this.shadow = false;
     }
 
     getHtmlElement() { 
         throw new Error('Method getHtmlElement must be implemented by child class!');
     }
+
+    setShadow() {
+       this.shadow = true;
+    }
+
+    setAttributes(shapeEl){
+        shapeEl.setAttribute('position', this.position);
+        shapeEl.setAttribute('color', this.color);
+        shapeEl.setAttribute('class', this.classes);
+        shapeEl.setAttribute(this.bodyType, '');
+        if(this.shadow){
+            shapeEl.setAttribute('material', 'opacity', 0.5);
+            const classes = shapeEl.getAttribute('class');
+            shapeEl.setAttribute('class', classes + ' shadow');
+        }
+    }
 }
 
 class Box extends CircuitElement {
-    constructor(width, height, depth, intersectionPoint, onclick) {
+    constructor(width, height, depth, intersectionPoint) {
         const color = '#4CC3D9';
         const classes = 'deletable';
         const newPosition = new Position(intersectionPoint.x, intersectionPoint.y,
             intersectionPoint.z);
-        super(newPosition, '', 'box', color, classes, onclick);
+        super(newPosition, '', 'box', color, classes);
         this.width = width;
         this.height = height;
         this.depth = depth;
@@ -42,44 +58,38 @@ class Box extends CircuitElement {
         shapeEl.setAttribute('width', this.width);
         shapeEl.setAttribute('height', this.height);
         shapeEl.setAttribute('depth', this.depth);
-        shapeEl.setAttribute('position', this.position);
-        shapeEl.setAttribute('color', this.color);
-        shapeEl.setAttribute('class', this.classes);
-        shapeEl.setAttribute(this.bodyType, '');
+        super.setAttributes(shapeEl);
         return shapeEl;
     }
 }
 
 class Sphere extends CircuitElement {
-    constructor(radius, intersectionPoint, onclick) {
+    constructor(radius, intersectionPoint) {
         const color = '#4CC3D9';
         const classes = 'deletable';
         const newPosition = new Position(intersectionPoint.x, intersectionPoint.y,
             intersectionPoint.z);
 
-        super(newPosition, '', 'sphere', color, classes, onclick);
+        super(newPosition, '', 'sphere', color, classes);
         this.radius = radius;
     }
 
     getHtmlElement() {
         const shapeEl = document.createElement('a-sphere');
         shapeEl.setAttribute('radius', this.radius);
-        shapeEl.setAttribute('position', this.position);
-        shapeEl.setAttribute('color', this.color);
-        shapeEl.setAttribute('class', this.classes);
-        shapeEl.setAttribute(this.bodyType, '');
+        super.setAttributes(shapeEl);
         return shapeEl;
     }
 }
 
 class Cylinder extends CircuitElement {
-    constructor(radius, height, intersectionPoint, onclick) {
+    constructor(radius, height, intersectionPoint) {
         const color = '#4CC3D9';
         const classes = 'deletable';
         const newPosition = new Position(intersectionPoint.x, intersectionPoint.y,
             intersectionPoint.z);
 
-        super(newPosition, '', 'cylinder', color, classes, onclick);
+        super(newPosition, '', 'cylinder', color, classes);
         this.radius = radius;
         this.height = height;
     }
@@ -88,11 +98,7 @@ class Cylinder extends CircuitElement {
         const shapeEl = document.createElement('a-cylinder');
         shapeEl.setAttribute('radius', this.radius);
         shapeEl.setAttribute('height', this.height);
-        shapeEl.setAttribute('position', this.position);
-        shapeEl.setAttribute('color', this.color);
-        shapeEl.setAttribute('class', this.classes);
-        shapeEl.setAttribute(this.bodyType, '');
-        console.log(this.position);
+        super.setAttributes(shapeEl);
         return shapeEl;
     }
 }

@@ -5,3 +5,7 @@ document.querySelector('a-scene').addEventListener('contextmenu', function (e) {
   e.stopPropagation();
   whiteboard.placeShape();
 });
+
+document.querySelector('a-scene').addEventListener('mousemove', function (e) {
+  whiteboard.placeShadowShape();
+});
