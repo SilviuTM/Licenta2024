@@ -22,15 +22,24 @@
   </div>
 
 
+  <a-scene>
+      <!-- Environment-->
+      <a-assets>
+        <img id="skybox" src="./img/clasa.jpg">
+      </a-assets>
+      <a-sky src="#skybox"></a-sky>
 
-  <a-scene physics="gravity: -9.8">
-      <a-entity  environment>
-      </a-entity>
-      <!-- Ground -->
-      <a-box id="whiteboard" position="0 1.3 0" rotation="0 0 0" width="4" height="1.8" depth="0.13" color="#7BC8A4" static-body class="clickable"></a-box>
+      <!-- Whiteboard -->
+      
+      <a-box id="whiteboard" position="0 1.7 0" rotation="0 0 0" width="4" height="1.8" depth="0.13" color="#7BC8A4" static-body class="clickable">
+        <a-box position="0 0.9 0" width="4.1" height="0.1" depth="0.19" color="#302B29" static-body></a-box>
+        <a-box position="0 -0.9 0" width="4.1" height="0.1" depth="0.19" color="#302B29" static-body></a-box>
+        <a-box position="-2 0 0" width="0.1" height="1.8" depth="0.19" color="#302B29" static-body></a-box>
+        <a-box position="2 0 0" width="0.1" height="1.8" depth="0.19" color="#302B29" static-body></a-box>
+      </a-box>
       
       <!-- Camera -->
-      <a-camera position="0 1.6 3">
+      <a-camera position="0 1.6 2">
         <a-cursor id="cursor" raycaster="objects: .clickable, .deletable"></a-cursor>
       </a-camera>
       
