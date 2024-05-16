@@ -2,10 +2,13 @@
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 10;
-    background: rgba(255, 255, 255, 0.8);
+    bottom: 10px;
     padding: 10px;
+    width: 150px;
     border-radius: 5px;
+    background: rgba(255, 255, 255, 0.8);
+    overflow: auto;
+    z-index: 10;
   }
   .ui-container button {
     display: block;
@@ -13,4 +16,12 @@
     padding: 10px;
     font-size: 16px;
     cursor: pointer;
+    width: 100%;
+  }
+
+  .ui-container button.active {
+    color: #086972;
+    border-color: #a7ff83;
+    border-style: solid;
+    background-color: #a7ff83;
   }
