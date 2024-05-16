@@ -1,4 +1,4 @@
-let currentShape = 'box'; // Default shape
+let currentShape = 'none'; // Default shape
 
 function setShape(shape, el) {
   const buttons = document.querySelectorAll('.ui-container-btn');
@@ -11,6 +11,9 @@ function setShape(shape, el) {
 
 // Function to create and place a shape at the cursor's intersection point
 function placeShape() {
+  if (currentShape === 'none')
+    return;
+
   const sceneEl = document.querySelector('a-scene');
   const cursorEl = document.querySelector('#cursor');
   const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
