@@ -1,6 +1,6 @@
 class Whiteboard {
   constructor() {
-    this.currentShape = 'box';
+    this.currentShape = 'bec';
     this.htmlElement = document.getElementById('whiteboard');
     const height = this.htmlElement.getAttribute('height');
     this.tileSize = height / 7;

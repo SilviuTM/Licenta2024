@@ -14,9 +14,9 @@
 <body>
   <div class="ui-container">
     <button class="ui-container-btn " onclick="whiteboard.setShape('none',this)">None</button>
-    <button class="ui-container-btn active" onclick="whiteboard.setShape('box',this)">Place Box</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('sphere',this)">Place Sphere</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('cylinder',this)">Place Cylinder</button>
+    <button class="ui-container-btn active" onclick="whiteboard.setShape('bec',this)">Place Lightbulb</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('baterie',this)">Place Battery</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('intrerupator',this)">Place Switch</button>
     <button class="ui-container-btn" onclick="whiteboard.setShape('delete',this)">Delete Object</button>
 
   </div>
@@ -25,7 +25,7 @@
   <a-scene>
       <!-- Environment-->
       <a-assets>
-        <img id="skybox" src="./img/clasa.jpg">
+        <img id="skybox" src="./img/clasa1500.png">
         <img id="rupator" src="./img/rupator.webp">
         <img id="bec" src="./img/idea.png">
         <img id="baterie" src="./img/baterie.webp">
@@ -33,7 +33,6 @@
       <a-sky src="#skybox"></a-sky>
 
       <!-- Whiteboard -->
-      
       <a-box id="whiteboard" position="0 1.7 0" rotation="0 0 0" width="4" height="1.8" depth="0.13" color="#7BC8A4" static-body class="clickable">
         <a-box position="0 0.9 0" width="4.1" height="0.1" depth="0.19" color="#302B29" static-body></a-box>
         <a-box position="0 -0.9 0" width="4.1" height="0.1" depth="0.19" color="#302B29" static-body></a-box>
