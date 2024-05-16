@@ -7,15 +7,16 @@
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <!-- <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script> -->
   <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+  <script src="./data/Whiteboard.js"></script>
     <link rel="stylesheet" href="simulation.css">
 </head>
 <body>
   <div class="ui-container">
-    <button class="ui-container-btn active" onclick="setShape('none',this)">None</button>
-    <button class="ui-container-btn" onclick="setShape('box',this)">Place Box</button>
-    <button class="ui-container-btn" onclick="setShape('sphere',this)">Place Sphere</button>
-    <button class="ui-container-btn" onclick="setShape('cylinder',this)">Place Cylinder</button>
-    <button class="ui-container-btn" onclick="setShape('delete',this)">Delete Object</button>
+    <button class="ui-container-btn active" onclick="whiteboard.setShape('none',this)">None</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('box',this)">Place Box</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('sphere',this)">Place Sphere</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('cylinder',this)">Place Cylinder</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('delete',this)">Delete Object</button>
 
   </div>
 
