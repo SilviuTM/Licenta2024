@@ -8,12 +8,13 @@
   <!-- <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script> -->
   <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
   <script src="./data/Whiteboard.js"></script>
+  <script src="./data/CircuitElement.js"></script>
     <link rel="stylesheet" href="simulation.css">
 </head>
 <body>
   <div class="ui-container">
-    <button class="ui-container-btn active" onclick="whiteboard.setShape('none',this)">None</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('box',this)">Place Box</button>
+    <button class="ui-container-btn " onclick="whiteboard.setShape('none',this)">None</button>
+    <button class="ui-container-btn active" onclick="whiteboard.setShape('box',this)">Place Box</button>
     <button class="ui-container-btn" onclick="whiteboard.setShape('sphere',this)">Place Sphere</button>
     <button class="ui-container-btn" onclick="whiteboard.setShape('cylinder',this)">Place Cylinder</button>
     <button class="ui-container-btn" onclick="whiteboard.setShape('delete',this)">Delete Object</button>
@@ -26,7 +27,7 @@
       <a-entity  environment>
       </a-entity>
       <!-- Ground -->
-      <a-box position="0 1.3 0" rotation="0 0 0" width="4" height="1.8" depth="0.13" color="#7BC8A4" static-body class="clickable"></a-box>
+      <a-box id="whiteboard" position="0 1.3 0" rotation="0 0 0" width="4" height="1.8" depth="0.13" color="#7BC8A4" static-body class="clickable"></a-box>
       
       <!-- Camera -->
       <a-camera position="0 1.6 3">
