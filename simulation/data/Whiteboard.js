@@ -48,7 +48,7 @@ class Whiteboard {
     this.currentShape = shape;
   }
 
-  #getShapeEl({isShadow = false}) {
+  #getShapeEl(props) {
     const cursorEl = document.querySelector('#cursor');
     const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
     if (intersection) {
@@ -70,7 +70,7 @@ class Whiteboard {
       // intersection.point.x = Number.parseInt(intersection.point.x * 10000 / this.tileSize / 10000) * this.tileSize;
       // intersection.point.y = Number.parseInt(intersection.point.y * 10000 / this.tileSize / 10000) * this.tileSize;
       const shapeEl = CircuitElementFactory.getShape(this.currentShape, intersection.point, this.tileSize);
-      if (isShadow) {
+      if (!!props && props.isShadow) {
         shapeEl.setShadow();
       }
       return shapeEl;
