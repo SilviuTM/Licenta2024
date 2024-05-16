@@ -43,7 +43,7 @@ class CircuitElement {
 
 class Box extends CircuitElement {
     constructor(width, height, depth, intersectionPoint) {
-        const color = '#4CC3D9';
+        const color = '#ffffff';
         const classes = 'deletable';
         const newPosition = new Position(intersectionPoint.x, intersectionPoint.y,
             intersectionPoint.z);
@@ -65,7 +65,7 @@ class Box extends CircuitElement {
 
 class Sphere extends CircuitElement {
     constructor(radius, intersectionPoint) {
-        const color = '#4CC3D9';
+        const color = '#ffffff';
         const classes = 'deletable';
         const newPosition = new Position(intersectionPoint.x, intersectionPoint.y,
             intersectionPoint.z);
@@ -103,16 +103,58 @@ class Cylinder extends CircuitElement {
     }
 }
 
+
+
+class Bec extends Box {
+    constructor(width, height, depth, intersectionPoint) {
+        super(width, height, depth, intersectionPoint);
+        this.img = '#bec';
+    }
+
+    getHtmlElement() {
+        const shapeEl = super.getHtmlElement();
+        shapeEl.setAttribute('material', 'src', this.img);
+        return shapeEl;
+    }
+}
+
+class Baterie extends Box {
+    constructor(width, height, depth, intersectionPoint) {
+        super(width, height, depth, intersectionPoint);
+        this.img = '#baterie';
+    }
+
+    getHtmlElement() {
+        const shapeEl = super.getHtmlElement();
+        shapeEl.setAttribute('material', 'src', this.img);
+        return shapeEl;
+    }
+}
+
+class Intrerupator extends Box {
+    constructor(width, height, depth, intersectionPoint) {
+        super(width, height, depth, intersectionPoint);
+        this.img = '#rupator';
+    }
+
+    getHtmlElement() {
+        const shapeEl = super.getHtmlElement();
+        shapeEl.setAttribute('material', 'src', this.img);
+        return shapeEl;
+    }
+}
+
+
 class CircuitElementFactory{
     static getShape(shapeType, intersectionPoint, hitbox){
         
         switch(shapeType){
             case 'box':
-                return new Box(hitbox, hitbox, hitbox, intersectionPoint);
+                return new Bec(hitbox, hitbox, hitbox, intersectionPoint);
             case 'sphere':
-                return new Sphere(hitbox / 2, intersectionPoint);
+                return new Baterie(hitbox, hitbox, hitbox, intersectionPoint);
             case 'cylinder':
-                return new Cylinder(hitbox / 2, hitbox, intersectionPoint);
+                return new Intrerupator(hitbox, hitbox, hitbox, intersectionPoint);
         }
     }
 }

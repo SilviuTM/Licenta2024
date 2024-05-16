@@ -78,20 +78,22 @@ class Whiteboard {
   }
 
   placeShadowShape() {
-    if (this.currentShape === 'none')
-      return;
-
-    if (this.currentShape === 'delete') {
-      this.#handleDelete();
-      return;
-    }
-
     const shadowElts = document.querySelectorAll('.shadow');
     shadowElts.forEach((elt) => {
       elt.parentNode.removeChild(elt);
     });
+    
+    if (this.currentShape === 'none')
+      return;
+
+    if (this.currentShape === 'delete') {
+      // this.#handleDelete();
+      return;
+    }
+
     const sceneEl = document.querySelector('a-scene');
     const shapeEl = this.#getShapeEl({isShadow: true});
+    if(!!shapeEl)
     sceneEl.appendChild(shapeEl.getHtmlElement());
   }
 
@@ -105,6 +107,7 @@ class Whiteboard {
     }
     const sceneEl = document.querySelector('a-scene');
     const shapeEl = this.#getShapeEl();
+    if(!!shapeEl)
     sceneEl.appendChild(shapeEl.getHtmlElement());
   }
 }
