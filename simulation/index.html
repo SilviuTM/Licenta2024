@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A-Frame Physics Example with Shape Selection and Deletion</title>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <!-- <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script> -->
+  <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+    <link rel="stylesheet" href="simulation.css">
+</head>
+<body>
+  <div class="ui-container">
+    <button onclick="setShape('box')">Place Box</button>
+    <button onclick="setShape('sphere')">Place Sphere</button>
+    <button onclick="setShape('cylinder')">Place Cylinder</button>
+    <button onclick="setShape('delete')">Delete Object</button>
+  </div>
+
+
+
+  <a-scene physics="gravity: -9.8">
+      <a-entity  environment>
+      </a-entity>
+      <!-- Ground -->
+      <a-plane position="0 0 0" rotation="-90 0 0" width="1000" height="1000" color="#7BC8A4" static-body class="clickable"
+      material="opacity: 0.0; transparent: true"></a-plane>
+      
+      <!-- Camera -->
+      <a-camera position="0 1.6 3">
+        <a-cursor id="cursor" raycaster="objects: .clickable, .deletable"></a-cursor>
+      </a-camera>
+      
+      <!-- Lights -->
+      <a-light type="ambient" color="#445451"></a-light>
+      <a-light type="directional" color="#ffffff" position="1 1 1"></a-light>
+    </a-scene>
+    <script src="simulation.js"></script>
+  </body>
+  </html>
