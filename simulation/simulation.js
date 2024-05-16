@@ -1,6 +1,11 @@
 let currentShape = 'box'; // Default shape
 
-function setShape(shape) {
+function setShape(shape, el) {
+  const buttons = document.querySelectorAll('.ui-container-btn');
+  buttons.forEach((button) => {
+    button.classList.remove('active');
+  });
+  el.classList.add('active');
   currentShape = shape;
 }
 
