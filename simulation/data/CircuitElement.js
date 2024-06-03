@@ -149,11 +149,11 @@ class CircuitElementFactory{
     static getShape(shapeType, intersectionPoint, hitbox){
         
         switch(shapeType){
-            case 'box':
+            case 'bec':
                 return new Bec(hitbox, hitbox, hitbox, intersectionPoint);
-            case 'sphere':
+            case 'baterie':
                 return new Baterie(hitbox, hitbox, hitbox, intersectionPoint);
-            case 'cylinder':
+            case 'intrerupator':
                 return new Intrerupator(hitbox, hitbox, hitbox, intersectionPoint);
         }
     }
