@@ -12,7 +12,7 @@ class Whiteboard {
     this.grid = this.#initGrid();
     this.shadowEl = null;
     this.shadowElShape = null;
-
+    console.log('rows and cols', this.rows, this.cols)
 
   }
 
@@ -61,14 +61,18 @@ class Whiteboard {
       const boardHeight = Number.parseFloat(this.htmlElement.getAttribute('height'));
       intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth'));
 
-      intersection.point.x = Math.round((intersection.point.x + boardWidth / 2) / this.tileSize) * this.tileSize - boardWidth / 2;
-      intersection.point.y = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize) * this.tileSize - boardHeight / 2;
+      const gridX = Math.round((intersection.point.x + boardWidth / 2) / this.tileSize);
+      const gridY = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize);
+      const adjustedGridY = this.rows - ( gridY - this.rows - 1) + 1;
+      intersection.point.x = gridX * this.tileSize - boardWidth / 2;
+      intersection.point.y = gridY * this.tileSize - boardHeight / 2;
 
+      
       const shapeEl = CircuitElementFactory.getShape(this.currentShape, intersection.point, this.tileSize);
       if (!!props && props.isShadow) {
         shapeEl.setShadow();
       }
-      return shapeEl;
+      return {shapeEl, gridX, gridY: adjustedGridY};
     }
   }
 
@@ -79,7 +83,7 @@ class Whiteboard {
     
     if(this.currentShape !== this.shadowElShape){
       this.shadowElShape = this.currentShape;
-      const shapeEl = this.#getShapeEl({ isShadow: true });
+      const {shapeEl} = this.#getShapeEl({ isShadow: true });
       if (shapeEl) {
           if (this.shadowEl) {
               sceneEl.removeChild(this.shadowEl);
@@ -90,7 +94,7 @@ class Whiteboard {
   }
 
     if (!this.shadowEl) {
-        const shapeEl = this.#getShapeEl({ isShadow: true });
+        const {shapeEl} = this.#getShapeEl({ isShadow: true });
         if (shapeEl) {
             this.shadowEl = shapeEl.getHtmlElement();
             sceneEl.appendChild(this.shadowEl);
@@ -117,8 +121,12 @@ class Whiteboard {
       return;
     }
     const sceneEl = document.querySelector('a-scene');
-    const shapeEl = this.#getShapeEl();
-    if(!!shapeEl)
-    sceneEl.appendChild(shapeEl.getHtmlElement());
+    const shapeData = this.#getShapeEl();
+    if (shapeData) {
+        const {shapeEl, gridX, gridY} = shapeData;
+        console.log(gridX, gridY);
+        if(!!shapeEl)
+            sceneEl.appendChild(shapeEl.getHtmlElement());
+    }
   }
 }
