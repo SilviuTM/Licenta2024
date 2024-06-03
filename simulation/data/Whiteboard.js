@@ -2,6 +2,7 @@ class Whiteboard {
   constructor() {
     this.currentShape = 'bec';
     this.htmlElement = document.getElementById('whiteboard');
+    this.htmlElement.setAttribute('material', 'opacity', 0);
     const height = this.htmlElement.getAttribute('height');
     this.tileSize = height / 7;
     const newWidth = Number.parseInt(this.htmlElement.getAttribute('width') / this.tileSize) * this.tileSize;
@@ -12,8 +13,7 @@ class Whiteboard {
     this.grid = this.#initGrid();
     this.shadowEl = null;
     this.shadowElShape = null;
-    console.log('rows and cols', this.rows, this.cols)
-
+    console.log('rows and cols', this.rows, this.cols);
   }
 
   #initGrid() {
