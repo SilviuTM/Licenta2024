@@ -123,10 +123,12 @@ class Whiteboard {
     const sceneEl = document.querySelector('a-scene');
     const shapeData = this.#getShapeEl();
     if (shapeData) {
-        const {shapeEl, gridX, gridY} = shapeData;
-        console.log(gridX, gridY);
+      const {shapeEl, gridX, gridY} = shapeData;
+      console.log('gridx gridy', gridX, gridY);
+        this.grid[gridX][gridY] = shapeEl;
         if(!!shapeEl)
             sceneEl.appendChild(shapeEl.getHtmlElement());
     }
+    console.log(this.grid);
   }
 }
