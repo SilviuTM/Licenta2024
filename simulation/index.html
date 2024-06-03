@@ -29,16 +29,12 @@
         <img id="rupator" src="./img/rupator.webp">
         <img id="bec" src="./img/idea.png">
         <img id="baterie" src="./img/baterie.webp">
+      <a-asset-item id="blackboard" src="./img/bb.glb"></a-asset-item>
       </a-assets>
       <a-sky src="#skybox"></a-sky>
 
       <!-- Whiteboard -->
-      <a-box id="whiteboard" position="0 1.7 0" rotation="0 0 0" width="4" height="1.8" depth="0.13" color="#7BC8A4" static-body class="clickable">
-        <a-box position="0 0.9 0" width="4.1" height="0.1" depth="0.19" color="#302B29" static-body></a-box>
-        <a-box position="0 -0.9 0" width="4.1" height="0.1" depth="0.19" color="#302B29" static-body></a-box>
-        <a-box position="-2 0 0" width="0.1" height="1.8" depth="0.19" color="#302B29" static-body></a-box>
-        <a-box position="2 0 0" width="0.1" height="1.8" depth="0.19" color="#302B29" static-body></a-box>
-      </a-box>
+      <a-entity gltf-model="#blackboard" position="-0.17 1.7 0" rotation="0 270 0"></a-entity>
       
       <!-- Camera -->
       <a-camera position="0 1.6 2">
