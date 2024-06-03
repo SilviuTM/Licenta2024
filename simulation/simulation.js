@@ -8,8 +8,8 @@ document.querySelector('a-scene').addEventListener('contextmenu', function (e) {
 });
 
 document.querySelector('a-scene').addEventListener('mousemove', function (e) {
-  clearTimeout(debounce);
-  debounce = setTimeout(function() {
+  // clearTimeout(debounce);
+  // debounce = setTimeout(function() {
     whiteboard.placeShadowShape();
-  }, 10);
+  // }, 10);
 });

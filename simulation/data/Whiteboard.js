@@ -109,6 +109,22 @@ class Whiteboard {
             intersection.point.y = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize) * this.tileSize - boardHeight / 2;
             this.shadowEl.setAttribute('position', intersection.point);
         }
+        else {
+          let intersection = {
+            point: {
+              x: 0,
+              y: 0,
+              z: 0
+            },
+            object: {
+              el: {
+                getAttribute: function(attribute) {
+                }
+              }
+            }
+          };
+          this.shadowEl.setAttribute('position', point);
+        }
     }
   }
 
@@ -125,7 +141,7 @@ class Whiteboard {
     if (shapeData) {
       const {shapeEl, gridX, gridY} = shapeData;
       console.log('gridx gridy', gridX, gridY);
-        this.grid[gridX][gridY] = shapeEl;
+        // this.grid[gridX][gridY] = shapeEl;
         if(!!shapeEl)
             sceneEl.appendChild(shapeEl.getHtmlElement());
     }
