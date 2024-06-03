@@ -21,7 +21,7 @@ class Whiteboard {
     for (let col = 0; col < this.cols; col++) {
       grid[col] = new Array(this.rows);
       for (let row = 0; row < this.rows; row++) {
-        grid[col][row] = 0;
+        grid[col][row] = '0';
       }
     }
     return grid;
@@ -141,10 +141,25 @@ class Whiteboard {
     if (shapeData) {
       const {shapeEl, gridX, gridY} = shapeData;
       // console.log('gridy gridx', gridX, gridY);
-        this.grid[gridY][gridX] = shapeEl.gridLetter;
+        this.grid[gridX][gridY] = shapeEl.gridLetter;
         if(!!shapeEl)
             sceneEl.appendChild(shapeEl.getHtmlElement());
     }
     console.log(this.grid);
+  }
+
+  sendGrid(){
+    fetch('https://localhost:7268/simulate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(this.grid)
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch((error) => {
+      console.error('Error:', error);
+    });
   }
 }
