@@ -1,3 +1,4 @@
+let debounce;
 const whiteboard = new Whiteboard();  
 
 document.querySelector('a-scene').addEventListener('contextmenu', function (e) {
@@ -7,5 +8,8 @@ document.querySelector('a-scene').addEventListener('contextmenu', function (e) {
 });
 
 document.querySelector('a-scene').addEventListener('mousemove', function (e) {
-  whiteboard.placeShadowShape();
+  clearTimeout(debounce);
+  debounce = setTimeout(function() {
+    whiteboard.placeShadowShape();
+  }, 10);
 });
