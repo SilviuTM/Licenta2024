@@ -10,6 +10,8 @@ class Whiteboard {
     this.rows = Number.parseInt(height / this.tileSize);
     this.cols = Number.parseInt(width / this.tileSize);
     this.grid = this.#initGrid();
+    this.shadowEl = null;
+    this.shadowElShape = null;
 
 
   }
@@ -71,23 +73,39 @@ class Whiteboard {
   }
 
   placeShadowShape() {
-    const shadowElts = document.querySelectorAll('.shadow');
-    shadowElts.forEach((elt) => {
-      elt.parentNode.removeChild(elt);
-    });
-    
-    if (this.currentShape === 'none')
-      return;
-
-    if (this.currentShape === 'delete') {
-      // this.#handleDelete();
-      return;
-    }
-
     const sceneEl = document.querySelector('a-scene');
-    const shapeEl = this.#getShapeEl({isShadow: true});
-    if(!!shapeEl)
-    sceneEl.appendChild(shapeEl.getHtmlElement());
+    const cursorEl = document.querySelector('#cursor');
+
+    
+    if(this.currentShape !== this.shadowElShape){
+      this.shadowElShape = this.currentShape;
+      const shapeEl = this.#getShapeEl({ isShadow: true });
+      if (shapeEl) {
+          if (this.shadowEl) {
+              sceneEl.removeChild(this.shadowEl);
+          }
+          this.shadowEl = shapeEl.getHtmlElement();
+          sceneEl.appendChild(this.shadowEl);
+      }
+  }
+
+    if (!this.shadowEl) {
+        const shapeEl = this.#getShapeEl({ isShadow: true });
+        if (shapeEl) {
+            this.shadowEl = shapeEl.getHtmlElement();
+            sceneEl.appendChild(this.shadowEl);
+        }
+    } else {
+        const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+        if (intersection) {
+            const boardWidth = parseFloat(this.htmlElement.getAttribute('width'));
+            const boardHeight = parseFloat(this.htmlElement.getAttribute('height'));
+            intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth'));
+            intersection.point.x = Math.round((intersection.point.x + boardWidth / 2) / this.tileSize) * this.tileSize - boardWidth / 2;
+            intersection.point.y = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize) * this.tileSize - boardHeight / 2;
+            this.shadowEl.setAttribute('position', intersection.point);
+        }
+    }
   }
 
   placeShape() {
