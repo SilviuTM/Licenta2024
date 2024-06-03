@@ -63,7 +63,7 @@ class Whiteboard {
 
       const gridX = Math.round((intersection.point.x + boardWidth / 2) / this.tileSize);
       const gridY = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize);
-      const adjustedGridY = this.rows - ( gridY - this.rows - 1) + 1;
+      const adjustedGridY = this.rows - ( gridY - this.rows ) ; // here update for y magic
       intersection.point.x = gridX * this.tileSize - boardWidth / 2;
       intersection.point.y = gridY * this.tileSize - boardHeight / 2;
 
