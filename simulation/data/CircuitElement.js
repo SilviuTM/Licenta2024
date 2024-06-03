@@ -109,6 +109,7 @@ class Bec extends Box {
     constructor(width, height, depth, intersectionPoint) {
         super(width, height, depth, intersectionPoint);
         this.img = '#bec';
+        this.gridLetter = 'l';
     }
 
     getHtmlElement() {
@@ -122,6 +123,8 @@ class Baterie extends Box {
     constructor(width, height, depth, intersectionPoint) {
         super(width, height, depth, intersectionPoint);
         this.img = '#baterie';
+        this.gridLetter = 'b';
+
     }
 
     getHtmlElement() {
@@ -135,6 +138,7 @@ class Intrerupator extends Box {
     constructor(width, height, depth, intersectionPoint) {
         super(width, height, depth, intersectionPoint);
         this.img = '#rupator';
+        this.gridLetter = 's';
     }
 
     getHtmlElement() {

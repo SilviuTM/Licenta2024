@@ -140,8 +140,8 @@ class Whiteboard {
     const shapeData = this.#getShapeEl();
     if (shapeData) {
       const {shapeEl, gridX, gridY} = shapeData;
-      console.log('gridx gridy', gridX, gridY);
-        // this.grid[gridX][gridY] = shapeEl;
+      // console.log('gridy gridx', gridX, gridY);
+        this.grid[gridY][gridX] = shapeEl.gridLetter;
         if(!!shapeEl)
             sceneEl.appendChild(shapeEl.getHtmlElement());
     }
