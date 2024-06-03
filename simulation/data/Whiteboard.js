@@ -123,7 +123,7 @@ class Whiteboard {
               }
             }
           };
-          this.shadowEl.setAttribute('position', point);
+          this.shadowEl.setAttribute('position', intersection);
         }
     }
   }
