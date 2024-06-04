@@ -17,6 +17,7 @@
     <button class="ui-container-btn active" onclick="whiteboard.setShape('bec',this)">Place Lightbulb</button>
     <button class="ui-container-btn" onclick="whiteboard.setShape('baterie',this)">Place Battery</button>
     <button class="ui-container-btn" onclick="whiteboard.setShape('intrerupator',this)">Place Switch</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('cablu',this)">Place Wire</button>
     <button class="ui-container-btn" onclick="whiteboard.setShape('delete',this)">Delete Object</button>
     <button class="ui-container-btn" onclick="whiteboard.sendGrid()">Next frame</button>
 
@@ -30,17 +31,35 @@
         <img id="rupator" src="./img/rupator.webp">
         <img id="bec" src="./img/idea.png">
         <img id="baterie" src="./img/baterie.webp">
-      <a-asset-item id="blackboard" src="./img/bb.glb"></a-asset-item>
+        <!-- Wires -->
+        <img id="W-none" src="./img/none.png">
+        <img id="W-1U" src="./img/oneU.png">
+        <img id="W-1D" src="./img/oneD.png">
+        <img id="W-1R" src="./img/oneR.png">
+        <img id="W-1L" src="./img/oneL.png">
+        <img id="W-IH" src="./img/lineH.png">
+        <img id="W-IV" src="./img/lineV.png">
+        <img id="W-L0" src="./img/L0.png">
+        <img id="W-L90" src="./img/L90.png">
+        <img id="W-L180" src="./img/L180.png">
+        <img id="W-L270" src="./img/L270.png">
+        <img id="W-T0" src="./img/T0.png">
+        <img id="W-T90" src="./img/T90.png">
+        <img id="W-T180" src="./img/T180.png">
+        <img id="W-T270" src="./img/T270.png">
+        <img id="W-all" src="./img/plus.png">
+        
+        <a-asset-item id="blackboard" src="./img/bb.glb"></a-asset-item>
       </a-assets>
       <a-sky src="#skybox"></a-sky>
 
       <!-- Whiteboard -->
-      <a-box id="whiteboard" position="0 1.7 0" rotation="0 0 0" width="5" height="1.7" depth="0.13" color="#7BC8A4" static-body class="clickable"></a-box>
+      <a-box id="whiteboard" position="0 1.7 0" rotation="0 0 0" width="5" height="1.7" depth="0.00000001" static-body class="clickable"></a-box>
       <a-entity gltf-model="#blackboard" position="-0.17 1.7 0" rotation="0 270 0"></a-entity>
       
       <!-- Camera -->
-      <a-camera position="0 1.6 2">
-        <a-cursor id="cursor" raycaster="objects: .clickable, .deletable"  color="#FFDAE9"></a-cursor>
+      <a-camera position="0 1.6 2" force-z-above-0>
+        <a-cursor id="cursor" raycaster="objects: .clickable, .deletable" color="#FFDAE9"></a-cursor>
       </a-camera>
       
       <!-- Lights -->

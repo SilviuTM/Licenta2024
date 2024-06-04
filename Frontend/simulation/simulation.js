@@ -13,3 +13,12 @@ document.querySelector('a-scene').addEventListener('mousemove', function (e) {
     whiteboard.placeShadowShape();
   // }, 10);
 });
+
+AFRAME.registerComponent('force-z-above-0', {
+  tick: function () {
+    const position = this.el.object3D.position;
+    if (position.z <= 0) {
+      position.z = 0;
+    }
+  }
+});

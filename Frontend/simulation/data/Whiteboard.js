@@ -17,11 +17,11 @@ class Whiteboard {
   }
 
   #initGrid() {
-    const grid = new Array(this.cols);
-    for (let col = 0; col < this.cols; col++) {
-      grid[col] = new Array(this.rows);
-      for (let row = 0; row < this.rows; row++) {
-        grid[col][row] = '0';
+    const grid = new Array(this.rows);
+    for (let row = 0; row < this.rows; row++) {
+      grid[row] = new Array(this.cols);
+      for (let col = 0; col < this.cols; col++) {
+        grid[row][col] = {letter: '0', html: null };
       }
     }
     return grid;
@@ -59,7 +59,8 @@ class Whiteboard {
       // in caz ca va fi vreodata nevoie de hitbox cu alt format decat 1:1
       const boardWidth = Number.parseFloat(this.htmlElement.getAttribute('width'));
       const boardHeight = Number.parseFloat(this.htmlElement.getAttribute('height'));
-      intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth'));
+      //intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth')); avea probleme de z variabil :(
+      intersection.point.z += 0;
 
       const gridX = Math.round((intersection.point.x + boardWidth / 2) / this.tileSize);
       const gridY = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize);
@@ -141,25 +142,102 @@ class Whiteboard {
     if (shapeData) {
       const {shapeEl, gridX, gridY} = shapeData;
       // console.log('gridy gridx', gridX, gridY);
-        this.grid[gridX][gridY] = shapeEl.gridLetter;
+        this.grid[gridY][gridX].letter = shapeEl.gridLetter;
         if(!!shapeEl)
-            sceneEl.appendChild(shapeEl.getHtmlElement());
+        {
+          const html = shapeEl.getHtmlElement();
+          this.grid[gridY][gridX].html = html;
+
+          this.handleCabluGraphics(gridY, gridX);
+          this.handleCabluGraphics(gridY + 1, gridX);
+          this.handleCabluGraphics(gridY - 1, gridX);
+          this.handleCabluGraphics(gridY, gridX + 1);
+          this.handleCabluGraphics(gridY, gridX - 1);
+
+          sceneEl.appendChild(html);
+        }
     }
     console.log(this.grid);
   }
 
   sendGrid(){
+    let s = "";
+    for (let row = 0; row < this.rows; row++)
+      for (let col = 0; col < this.cols; col++)
+        s += this.grid[row][col].letter;
+
+
     fetch('https://localhost:7268/simulate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(this.grid)
+      body: JSON.stringify(s)
     })
     .then(response => response.json())
     .then(data => console.log(data))
     .catch((error) => {
       console.error('Error:', error);
     });
+  }
+
+  handleCabluGraphics(row, col) {
+    if (row < 0 || row >= this.rows) return;
+    if (col < 0 || col >= this.cols) return;
+    if (this.grid[row][col].letter != 'c') return;
+
+    let hasLeft = false, hasRight = false, hasUp = false, hasDown = false;
+    if (row - 1 >= 0 && this.grid[row - 1][col].letter != '0') hasUp = true;
+    if (row + 1 < this.rows && this.grid[row + 1][col].letter != '0') hasDown = true;
+    if (col - 1 >= 0 && this.grid[row][col - 1].letter != '0') hasLeft = true;
+    if (col + 1 < this.cols && this.grid[row][col + 1].letter != '0') hasRight = true;
+
+    if (hasUp == true && hasDown == true && hasLeft == true && hasRight == true) // +
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-all')
+
+    else if (hasDown == true && hasLeft == true && hasRight == true) // T - 0
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-T0')
+
+    else if (hasUp == true && hasDown == true && hasLeft == true) // T - 90
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-T90')
+
+    else if (hasUp == true && hasLeft == true && hasRight == true) // T - 180
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-T180')
+
+    else if (hasUp == true && hasDown == true && hasRight == true) // T - 270
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-T270')
+
+    else if (hasUp == true && hasDown == true) // I - V
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-IV')
+
+    else if (hasLeft == true && hasRight == true) // I - H
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-IH')
+
+    else if (hasUp == true && hasRight == true) // L - 0
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-L0')
+
+    else if (hasDown == true && hasRight == true) // L - 90
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-L90')
+
+    else if (hasDown == true && hasLeft == true) // L - 180
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-L180')
+
+    else if (hasUp == true && hasLeft == true) // L - 270
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-L270')
+
+    else if (hasUp == true) // single - Up
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-1U')
+
+    else if (hasDown == true) // single - Down
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-1D')
+      
+    else if (hasLeft == true) // single - Left
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-1L')
+    
+    else if (hasRight == true) // single - Right
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-1R')
+
+    else // none
+      this.grid[row][col].html.setAttribute('material', 'src', '#W-none')
   }
 }

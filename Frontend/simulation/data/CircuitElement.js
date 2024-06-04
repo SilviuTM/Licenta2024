@@ -148,6 +148,19 @@ class Intrerupator extends Box {
     }
 }
 
+class Cablu extends Box {
+    constructor(width, height, depth, intersectionPoint) {
+        super(width, height, depth, intersectionPoint);
+        this.img = '#W-none';
+        this.gridLetter = 'c';
+    }
+
+    getHtmlElement() {
+        const shapeEl = super.getHtmlElement();
+        shapeEl.setAttribute('material', 'src', this.img);
+        return shapeEl;
+    }
+}
 
 class CircuitElementFactory{
     static getShape(shapeType, intersectionPoint, hitbox){
@@ -159,6 +172,8 @@ class CircuitElementFactory{
                 return new Baterie(hitbox, hitbox, hitbox, intersectionPoint);
             case 'intrerupator':
                 return new Intrerupator(hitbox, hitbox, hitbox, intersectionPoint);
+            case 'cablu':
+                return new Cablu(hitbox, hitbox, hitbox, intersectionPoint);
         }
     }
 }
