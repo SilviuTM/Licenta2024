@@ -180,6 +180,12 @@ class Whiteboard {
     }
   }
 
+
+  startAnimation(elt) {
+    elt.innerHTML = 'Stop';
+    setInterval(this.sendGrid.bind(this), 1000);
+  }
+
   sendGrid() {
     const newGrid = this.grid.map((row) => row.map((cell) => {
       return { Letter: cell.gridLetter, Active: cell.active }
