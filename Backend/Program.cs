@@ -1,3 +1,4 @@
+using Licenta;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +39,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/simulate", ([FromBody]char[][] ) =>
+app.MapPost("/simulate", ([FromBody] CircuitElement[][] mat) =>
 {
 
     return new List<int>();

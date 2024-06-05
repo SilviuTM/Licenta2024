@@ -24,6 +24,7 @@ class CircuitElement {
         this.bodyType = 'dynamic-body';
         this.shadow = false;
         this.htmlElt = this.#buildHtmlElement();
+        this.active = false;
     }
 
     setShadow() {
@@ -96,6 +97,8 @@ class Cablu extends CircuitElement {
         this.img = '#W-none';
         this.gridLetter = 'c';
         this.htmlElt.setAttribute('material', 'src', this.img);
+
+
     }
 
     getHtmlElement() {
