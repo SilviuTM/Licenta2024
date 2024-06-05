@@ -38,7 +38,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/simulate", ([FromBody]char[][] mat) =>
+app.MapPost("/simulate", ([FromBody]char[][] ) =>
 {
 
     return new List<int>();

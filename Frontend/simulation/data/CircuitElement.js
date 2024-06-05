@@ -68,6 +68,7 @@ class Baterie extends CircuitElement {
         super(width, height, depth, intersectionPoint);
         this.img = '#baterie';
         this.gridLetter = 'b';
+        this.htmlElt.setAttribute('material', 'src', this.img);
     }
 
     getHtmlElement() {

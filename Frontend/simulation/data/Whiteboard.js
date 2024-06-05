@@ -36,13 +36,39 @@ class Whiteboard {
     el.classList.add('active');
   }
 
+  #evaluateCablus(Y,X){
+    this.handleCabluGraphics(Y, X);
+    this.handleCabluGraphics(Y + 1, X);
+    this.handleCabluGraphics(Y - 1, X);
+    this.handleCabluGraphics(Y, X + 1);
+    this.handleCabluGraphics(Y, X - 1);
+  }
+
+  #getGridCoords(intersection) {
+        // in caz ca va fi vreodata nevoie de hitbox cu alt format decat 1:1
+        const boardWidth = Number.parseFloat(this.htmlElement.getAttribute('width'));
+        const boardHeight = Number.parseFloat(this.htmlElement.getAttribute('height'));
+        //intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth')); avea probleme de z variabil :(
+        intersection.point.z += 0;
+  
+        const gridX = Math.round((intersection.point.x + boardWidth / 2) / this.tileSize);
+        const gridY = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize);
+        const adjustedGridY = this.rows - ( gridY - this.rows ) ; // here update for y magic
+        return {gridX, gridY, adjustedGridY};
+  }
+
   #handleDelete() {
     const sceneEl = document.querySelector('a-scene');
     const cursorEl = document.querySelector('#cursor');
-    const deletableIntersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.deletable'));
-    if (deletableIntersection) {
-      sceneEl.removeChild(deletableIntersection.object.el);
-    };
+    const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+    if (intersection){
+      const {gridX, adjustedGridY } = this.#getGridCoords(intersection);
+      if (this.grid[adjustedGridY][gridX].gridLetter != '0') {
+        RemoveIfExists({parent: sceneEl, child: this.grid[adjustedGridY][gridX].htmlElt});
+        this.grid[adjustedGridY][gridX] = {gridLetter: '0'};
+        this.#evaluateCablus(adjustedGridY, gridX);
+      }
+    }
   }
 
 
@@ -56,15 +82,9 @@ class Whiteboard {
     const cursorEl = document.querySelector('#cursor');
     const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
     if (intersection) {
-      // in caz ca va fi vreodata nevoie de hitbox cu alt format decat 1:1
       const boardWidth = Number.parseFloat(this.htmlElement.getAttribute('width'));
       const boardHeight = Number.parseFloat(this.htmlElement.getAttribute('height'));
-      //intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth')); avea probleme de z variabil :(
-      intersection.point.z += 0;
-
-      const gridX = Math.round((intersection.point.x + boardWidth / 2) / this.tileSize);
-      const gridY = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize);
-      const adjustedGridY = this.rows - ( gridY - this.rows ) ; // here update for y magic
+      const {gridX, gridY, adjustedGridY} = this.#getGridCoords(intersection);
       intersection.point.x = gridX * this.tileSize - boardWidth / 2;
       intersection.point.y = gridY * this.tileSize - boardHeight / 2;
 
@@ -73,22 +93,24 @@ class Whiteboard {
       if (!!props && props.isShadow) {
         shapeEl.setShadow();
       }
-      return {shapeEl, gridX, gridY: adjustedGridY};
+      return {shapeEl, gridX, gridY, adjustedGridY};
     }
   }
 
   placeShadowShape() {
     const sceneEl = document.querySelector('a-scene');
     const cursorEl = document.querySelector('#cursor');
-
+    if(this.currentShape === 'none' || this.currentShape === 'delete'){
+      RemoveIfExists({parent: sceneEl, child: this.shadowEl});
+      this.shadowEl = null;
+      return;
+    } 
     
     if(this.currentShape !== this.shadowElShape){
       this.shadowElShape = this.currentShape;
       const {shapeEl} = this.#getShapeEl({ isShadow: true });
       if (shapeEl) {
-          if (this.shadowEl) {
-              sceneEl.removeChild(this.shadowEl);
-          }
+          RemoveIfExists({parent: sceneEl, child: this.shadowEl});
           this.shadowEl = shapeEl.htmlElt;
           sceneEl.appendChild(this.shadowEl);
       }
@@ -105,7 +127,7 @@ class Whiteboard {
         if (intersection) {
             const boardWidth = parseFloat(this.htmlElement.getAttribute('width'));
             const boardHeight = parseFloat(this.htmlElement.getAttribute('height'));
-            intersection.point.z += Number.parseFloat(intersection.object.el.getAttribute('depth'));
+            intersection.point.z += 0;
             intersection.point.x = Math.round((intersection.point.x + boardWidth / 2) / this.tileSize) * this.tileSize - boardWidth / 2;
             intersection.point.y = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize) * this.tileSize - boardHeight / 2;
             this.shadowEl.setAttribute('position', intersection.point);
@@ -116,12 +138,6 @@ class Whiteboard {
               x: 0,
               y: 0,
               z: 0
-            },
-            object: {
-              el: {
-                getAttribute: function(attribute) {
-                }
-              }
             }
           };
           this.shadowEl.setAttribute('position', intersection);
@@ -140,22 +156,17 @@ class Whiteboard {
     const sceneEl = document.querySelector('a-scene');
     const shapeData = this.#getShapeEl();
     if (shapeData) {
-      const {shapeEl, gridX, gridY} = shapeData;
+      const {shapeEl, gridX, adjustedGridY} = shapeData;
       // console.log('gridy gridx', gridX, gridY);
-        this.grid[gridY][gridX].gridLetter = shapeEl.gridLetter;
+        this.grid[adjustedGridY][gridX].gridLetter = shapeEl.gridLetter;
         if(!!shapeEl)
         {
-          this.grid[gridY][gridX] = shapeEl;
-          this.handleCabluGraphics(gridY, gridX);
-          this.handleCabluGraphics(gridY + 1, gridX);
-          this.handleCabluGraphics(gridY - 1, gridX);
-          this.handleCabluGraphics(gridY, gridX + 1);
-          this.handleCabluGraphics(gridY, gridX - 1);
-
+          this.grid[adjustedGridY][gridX] = shapeEl;
+          this.#evaluateCablus(adjustedGridY, gridX);
           sceneEl.appendChild(shapeEl.htmlElt);
         }
     }
-    console.log(this.grid);
+    // console.log(this.grid);
   }
 
   sendGrid(){
@@ -187,51 +198,51 @@ class Whiteboard {
     if (col + 1 < this.cols && this.grid[row][col + 1].gridLetter != '0') hasRight = true;
 
     if (hasUp == true && hasDown == true && hasLeft == true && hasRight == true) // +
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-all')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-all')
 
     else if (hasDown == true && hasLeft == true && hasRight == true) // T - 0
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-T0')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-T0')
 
     else if (hasUp == true && hasDown == true && hasLeft == true) // T - 90
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-T90')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-T90')
 
     else if (hasUp == true && hasLeft == true && hasRight == true) // T - 180
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-T180')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-T180')
 
     else if (hasUp == true && hasDown == true && hasRight == true) // T - 270
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-T270')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-T270')
 
     else if (hasUp == true && hasDown == true) // I - V
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-IV')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-IV')
 
     else if (hasLeft == true && hasRight == true) // I - H
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-IH')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-IH')
 
     else if (hasUp == true && hasRight == true) // L - 0
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-L0')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-L0')
 
     else if (hasDown == true && hasRight == true) // L - 90
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-L90')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-L90')
 
     else if (hasDown == true && hasLeft == true) // L - 180
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-L180')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-L180')
 
     else if (hasUp == true && hasLeft == true) // L - 270
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-L270')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-L270')
 
     else if (hasUp == true) // single - Up
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-1U')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-1U')
 
     else if (hasDown == true) // single - Down
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-1D')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-1D')
       
     else if (hasLeft == true) // single - Left
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-1L')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-1L')
     
     else if (hasRight == true) // single - Right
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-1R')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-1R')
 
     else // none
-      this.grid[row][col].html.setAttribute('material', 'src', '#W-none')
+      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-none')
   }
 }
