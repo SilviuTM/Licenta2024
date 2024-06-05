@@ -17,6 +17,8 @@
             // pune sa fie facut din input pe baza rotatiei
             // momentan, vezi doar de unde iese fir
 
+            circuit[row][col].Active = true;
+
             if (row > 0) TraverseFromWire(circuit, 'S', row - 1, col);
             if (row < circuit.GetLength(0) - 1) TraverseFromWire(circuit, 'N', row + 1, col);
             if (col > 0) TraverseFromWire(circuit, 'E', row, col - 1);
@@ -30,6 +32,7 @@
 
             else if (circuit[row][col].Letter == 'c')
             {
+                circuit[row][col].Active = true;
 
                 if (row > 0 && cameFrom != 'N') TraverseFromWire(circuit, 'S', row - 1, col);
                 if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') TraverseFromWire(circuit, 'N', row + 1, col);
