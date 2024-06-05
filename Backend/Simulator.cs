@@ -30,6 +30,7 @@
 
             else if (circuit[row][col].Letter == 'c')
             {
+                circuit[row][col].Active = true;
 
                 if (row > 0 && cameFrom != 'N') TraverseFromWire(circuit, 'S', row - 1, col);
                 if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') TraverseFromWire(circuit, 'N', row + 1, col);
