@@ -2,6 +2,13 @@
 {
     public static class Simulator
     {
+        public static void ResetCircuit(CircuitElement[][] circuit)
+        {
+            for (int row = 0; row < circuit.GetLength(0); row++)
+                for (int col = 0; col < circuit[row].Length; col++)
+                    circuit[row][col].Active = false;
+        }
+
         public static CircuitElement[][] Simulate(CircuitElement[][] circuit)
         {
             for (int row = 0; row < circuit.GetLength(0); row++)

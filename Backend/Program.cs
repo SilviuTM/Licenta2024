@@ -41,6 +41,7 @@ app.UseHttpsRedirection();
 
 app.MapPost("/simulate", ([FromBody] CircuitElement[][] mat) =>
 {
+    Simulator.ResetCircuit(mat);
     Simulator.Simulate(mat);
 
     return mat;
