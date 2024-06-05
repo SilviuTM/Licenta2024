@@ -54,7 +54,7 @@
       <a-sky src="#skybox"></a-sky>
 
       <!-- Whiteboard -->
-      <a-box id="whiteboard" position="0 1.7 0" rotation="0 0 0" width="5" height="1.7" depth="0.00000001" static-body class="clickable"></a-box>
+      <a-box id="whiteboard" position="0 1.7 0" rotation="0 0 0" width="5" height="1.75" depth="0.00000001" static-body class="clickable"></a-box>
       <a-entity gltf-model="#blackboard" position="-0.17 1.7 0" rotation="0 270 0"></a-entity>
       
       <!-- Camera -->
@@ -64,7 +64,21 @@
       
       <!-- Lights -->
       <a-light type="ambient" color="#445451"></a-light>
-      <a-light type="directional" color="#ffffff" position="1 1 1"></a-light>
+      <a-light type="directional" color="#ffffff" position="0 0.5 1"></a-light>
+
+
+      <!-- I am going to use this later, once all models are in
+      <a-light type="point" color="#445451" position="0 2 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="-1 2 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="1 2 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="0 1 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="-1 1 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="1 1 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="0 3 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="-1 3 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="1 3 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="2 3 1" intensity="2"></a-light>
+      <a-light type="point" color="#445451" position="-2 3 1" intensity="2"></a-light> -->
     </a-scene>
     <script src="simulation.js"></script>
   </body>

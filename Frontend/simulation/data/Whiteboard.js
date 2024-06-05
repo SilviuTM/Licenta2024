@@ -4,7 +4,7 @@ class Whiteboard {
     this.htmlElement = document.getElementById('whiteboard');
     this.htmlElement.setAttribute('material', 'opacity', 0);
     const height = this.htmlElement.getAttribute('height');
-    this.tileSize = height / 7;
+    this.tileSize = height / 14;
     const newWidth = Number.parseInt(this.htmlElement.getAttribute('width') / this.tileSize) * this.tileSize;
     this.htmlElement.setAttribute('width', newWidth);
     const width = this.htmlElement.getAttribute('width');
@@ -92,7 +92,7 @@ class Whiteboard {
           this.shadowEl = shapeEl.getHtmlElement();
           sceneEl.appendChild(this.shadowEl);
       }
-  }
+    }
 
     if (!this.shadowEl) {
         const {shapeEl} = this.#getShapeEl({ isShadow: true });
