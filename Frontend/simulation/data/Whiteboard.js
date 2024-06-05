@@ -21,7 +21,7 @@ class Whiteboard {
     for (let row = 0; row < this.rows; row++) {
       grid[row] = new Array(this.cols);
       for (let col = 0; col < this.cols; col++) {
-        grid[row][col] = {letter: '0', html: null };
+        grid[row][col] = {gridLetter: '0'};
       }
     }
     return grid;
@@ -89,7 +89,7 @@ class Whiteboard {
           if (this.shadowEl) {
               sceneEl.removeChild(this.shadowEl);
           }
-          this.shadowEl = shapeEl.getHtmlElement();
+          this.shadowEl = shapeEl.htmlElt;
           sceneEl.appendChild(this.shadowEl);
       }
     }
@@ -97,7 +97,7 @@ class Whiteboard {
     if (!this.shadowEl) {
         const {shapeEl} = this.#getShapeEl({ isShadow: true });
         if (shapeEl) {
-            this.shadowEl = shapeEl.getHtmlElement();
+            this.shadowEl = shapeEl.htmlElt;
             sceneEl.appendChild(this.shadowEl);
         }
     } else {
@@ -142,37 +142,31 @@ class Whiteboard {
     if (shapeData) {
       const {shapeEl, gridX, gridY} = shapeData;
       // console.log('gridy gridx', gridX, gridY);
-        this.grid[gridY][gridX].letter = shapeEl.gridLetter;
+        this.grid[gridY][gridX].gridLetter = shapeEl.gridLetter;
         if(!!shapeEl)
         {
-          const html = shapeEl.getHtmlElement();
-          this.grid[gridY][gridX].html = html;
-
+          this.grid[gridY][gridX] = shapeEl;
           this.handleCabluGraphics(gridY, gridX);
           this.handleCabluGraphics(gridY + 1, gridX);
           this.handleCabluGraphics(gridY - 1, gridX);
           this.handleCabluGraphics(gridY, gridX + 1);
           this.handleCabluGraphics(gridY, gridX - 1);
 
-          sceneEl.appendChild(html);
+          sceneEl.appendChild(shapeEl.htmlElt);
         }
     }
     console.log(this.grid);
   }
 
   sendGrid(){
-    let s = "";
-    for (let row = 0; row < this.rows; row++)
-      for (let col = 0; col < this.cols; col++)
-        s += this.grid[row][col].letter;
-
+    const newGrid = this.grid.map((row) => row.map((cell) => cell.gridLetter));
 
     fetch('https://localhost:7268/simulate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(s)
+      body: JSON.stringify(newGrid)
     })
     .then(response => response.json())
     .then(data => console.log(data))
@@ -184,13 +178,13 @@ class Whiteboard {
   handleCabluGraphics(row, col) {
     if (row < 0 || row >= this.rows) return;
     if (col < 0 || col >= this.cols) return;
-    if (this.grid[row][col].letter != 'c') return;
+    if (this.grid[row][col].gridLetter != 'c') return;
 
     let hasLeft = false, hasRight = false, hasUp = false, hasDown = false;
-    if (row - 1 >= 0 && this.grid[row - 1][col].letter != '0') hasUp = true;
-    if (row + 1 < this.rows && this.grid[row + 1][col].letter != '0') hasDown = true;
-    if (col - 1 >= 0 && this.grid[row][col - 1].letter != '0') hasLeft = true;
-    if (col + 1 < this.cols && this.grid[row][col + 1].letter != '0') hasRight = true;
+    if (row - 1 >= 0 && this.grid[row - 1][col].gridLetter != '0') hasUp = true;
+    if (row + 1 < this.rows && this.grid[row + 1][col].gridLetter != '0') hasDown = true;
+    if (col - 1 >= 0 && this.grid[row][col - 1].gridLetter != '0') hasLeft = true;
+    if (col + 1 < this.cols && this.grid[row][col + 1].gridLetter != '0') hasRight = true;
 
     if (hasUp == true && hasDown == true && hasLeft == true && hasRight == true) // +
       this.grid[row][col].html.setAttribute('material', 'src', '#W-all')

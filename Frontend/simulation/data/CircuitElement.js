@@ -10,155 +10,95 @@ class Position {
 
 
 class CircuitElement {
-    constructor(p, img, type, color, classes) {
-        this.position = p;
-        this.img = img;
-        this.type = type;
-        this.color = color;
-        this.classes = classes;
+    constructor(width, height, depth, intersectionPoint) {
+        const newPosition = new Position(intersectionPoint.x, intersectionPoint.y,
+            intersectionPoint.z);
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
+        this.position = newPosition;
+        this.img = '';
+        this.type = 'box';
+        this.color = '#ffffff';
+        this.classes = 'deletable';
         this.bodyType = 'dynamic-body';
         this.shadow = false;
-    }
-
-    getHtmlElement() { 
-        throw new Error('Method getHtmlElement must be implemented by child class!');
+        this.htmlElt = this.#buildHtmlElement();
     }
 
     setShadow() {
        this.shadow = true;
+       this.htmlElt.setAttribute('material', 'opacity', 0.5);
+       const classes = this.htmlElt.getAttribute('class');
+       this.htmlElt.setAttribute('class', classes + ' shadow');
     }
 
-    setAttributes(shapeEl){
-        shapeEl.setAttribute('position', this.position);
-        shapeEl.setAttribute('color', this.color);
-        shapeEl.setAttribute('class', this.classes);
-        shapeEl.setAttribute(this.bodyType, '');
-        if(this.shadow){
-            shapeEl.setAttribute('material', 'opacity', 0.5);
-            const classes = shapeEl.getAttribute('class');
-            shapeEl.setAttribute('class', classes + ' shadow');
-        }
+    #buildHtmlElement() {
+        const html = document.createElement('a-box');
+        html.setAttribute('width', this.width);
+        html.setAttribute('height', this.height);
+        html.setAttribute('depth', this.depth);
+        html.setAttribute('position', this.position);
+        html.setAttribute('color', this.color);
+        html.setAttribute('class', this.classes);
+        html.setAttribute(this.bodyType, '');
+        return html;
     }
-}
-
-class Box extends CircuitElement {
-    constructor(width, height, depth, intersectionPoint) {
-        const color = '#ffffff';
-        const classes = 'deletable';
-        const newPosition = new Position(intersectionPoint.x, intersectionPoint.y,
-            intersectionPoint.z);
-        super(newPosition, '', 'box', color, classes);
-        this.width = width;
-        this.height = height;
-        this.depth = depth;
-    }
-
-    getHtmlElement() {
-        const shapeEl = document.createElement('a-box');
-        shapeEl.setAttribute('width', this.width);
-        shapeEl.setAttribute('height', this.height);
-        shapeEl.setAttribute('depth', this.depth);
-        super.setAttributes(shapeEl);
-        return shapeEl;
-    }
-}
-
-class Sphere extends CircuitElement {
-    constructor(radius, intersectionPoint) {
-        const color = '#ffffff';
-        const classes = 'deletable';
-        const newPosition = new Position(intersectionPoint.x, intersectionPoint.y,
-            intersectionPoint.z);
-
-        super(newPosition, '', 'sphere', color, classes);
-        this.radius = radius;
-    }
-
-    getHtmlElement() {
-        const shapeEl = document.createElement('a-sphere');
-        shapeEl.setAttribute('radius', this.radius);
-        super.setAttributes(shapeEl);
-        return shapeEl;
-    }
-}
-
-class Cylinder extends CircuitElement {
-    constructor(radius, height, intersectionPoint) {
-        const color = '#4CC3D9';
-        const classes = 'deletable';
-        const newPosition = new Position(intersectionPoint.x, intersectionPoint.y,
-            intersectionPoint.z);
-
-        super(newPosition, '', 'cylinder', color, classes);
-        this.radius = radius;
-        this.height = height;
-    }
-
-    getHtmlElement() {
-        const shapeEl = document.createElement('a-cylinder');
-        shapeEl.setAttribute('radius', this.radius);
-        shapeEl.setAttribute('height', this.height);
-        super.setAttributes(shapeEl);
-        return shapeEl;
-    }
+  
 }
 
 
 
-class Bec extends Box {
+
+class Bec extends CircuitElement {
     constructor(width, height, depth, intersectionPoint) {
         super(width, height, depth, intersectionPoint);
         this.img = '#bec';
         this.gridLetter = 'l';
+        this.htmlElt.setAttribute('material', 'src', this.img);
     }
 
     getHtmlElement() {
-        const shapeEl = super.getHtmlElement();
-        shapeEl.setAttribute('material', 'src', this.img);
-        return shapeEl;
+        return this.htmlElt;
     }
 }
 
-class Baterie extends Box {
+class Baterie extends CircuitElement {
     constructor(width, height, depth, intersectionPoint) {
         super(width, height, depth, intersectionPoint);
         this.img = '#baterie';
         this.gridLetter = 'b';
-
     }
 
     getHtmlElement() {
-        const shapeEl = super.getHtmlElement();
-        shapeEl.setAttribute('material', 'src', this.img);
-        return shapeEl;
+        return this.htmlElt;
     }
 }
 
-class Intrerupator extends Box {
+class Intrerupator extends CircuitElement {
     constructor(width, height, depth, intersectionPoint) {
         super(width, height, depth, intersectionPoint);
         this.img = '#rupator';
         this.gridLetter = 's';
+        this.htmlElt.setAttribute('material', 'src', this.img);
+
     }
 
     getHtmlElement() {
-        const shapeEl = super.getHtmlElement();
-        shapeEl.setAttribute('material', 'src', this.img);
-        return shapeEl;
+        return this.htmlElt;
     }
 }
 
-class Cablu extends Box {
+class Cablu extends CircuitElement {
     constructor(width, height, depth, intersectionPoint) {
         super(width, height, depth, intersectionPoint);
         this.img = '#W-none';
         this.gridLetter = 'c';
+        this.htmlElt.setAttribute('material', 'src', this.img);
     }
 
     getHtmlElement() {
-        const shapeEl = super.getHtmlElement();
-        shapeEl.setAttribute('material', 'src', this.img);
-        return shapeEl;
+       return this.htmlElt;
     }
 }
 
