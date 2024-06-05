@@ -163,6 +163,7 @@ class Whiteboard {
       this.grid[adjustedGridY][gridX].gridLetter = shapeEl.gridLetter;
       console.log('grid', adjustedGridY, gridX);
       if (!!shapeEl) {
+        RemoveIfExists({ parent: sceneEl, child: this.grid[adjustedGridY][gridX].htmlElt  });
         this.grid[adjustedGridY][gridX] = shapeEl;
         this.#evaluateCablus(adjustedGridY, gridX);
         sceneEl.appendChild(shapeEl.htmlElt);
