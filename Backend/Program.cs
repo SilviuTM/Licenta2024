@@ -41,8 +41,9 @@ app.UseHttpsRedirection();
 
 app.MapPost("/simulate", ([FromBody] CircuitElement[][] mat) =>
 {
+    Simulator.Simulate(mat);
 
-    return new List<int>();
+    return mat;
 })
 .WithName("Licenta")
 .WithOpenApi();
