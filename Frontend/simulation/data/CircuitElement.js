@@ -19,7 +19,7 @@ class CircuitElement {
         this.position = newPosition;
         this.img = '';
         this.type = 'box';
-        this.color = '#ffffff';
+        this.color = '#ff0000';
         this.classes = 'deletable';
         this.bodyType = 'dynamic-body';
         this.shadow = false;
@@ -32,6 +32,16 @@ class CircuitElement {
        this.htmlElt.setAttribute('material', 'opacity', 0.5);
        const classes = this.htmlElt.getAttribute('class');
        this.htmlElt.setAttribute('class', classes + ' shadow');
+    }
+
+    setActive(active){
+        this.active = active;
+        console.log(active);
+        if(active){
+            this.htmlElt.setAttribute('color', '#00ff00');
+        }else{
+            this.htmlElt.setAttribute('color', '#ff0000');
+        }
     }
 
     #buildHtmlElement() {

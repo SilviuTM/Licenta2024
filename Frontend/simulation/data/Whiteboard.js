@@ -21,7 +21,7 @@ class Whiteboard {
     for (let row = 0; row < this.rows; row++) {
       grid[row] = new Array(this.cols);
       for (let col = 0; col < this.cols; col++) {
-        grid[row][col] = { gridLetter: '0' };
+        grid[row][col] = { gridLetter: '0', active: false };
       }
     }
     return grid;
@@ -170,6 +170,16 @@ class Whiteboard {
     // console.log(this.grid);
   }
 
+  #handleReceivedData(data) {
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].length; j++) {
+        if (data[i][j].letter !== '0') {
+          this.grid[i][j].setActive(data[i][j].active);
+        }
+      }
+    }
+  }
+
   sendGrid() {
     const newGrid = this.grid.map((row) => row.map((cell) => {
       return { Letter: cell.gridLetter, Active: cell.active }
@@ -183,7 +193,7 @@ class Whiteboard {
       body: JSON.stringify(newGrid)
     })
       .then(response => response.json())
-      .then(data => console.log(data))
+      .then(this.#handleReceivedData.bind(this))
       .catch((error) => {
         console.error('Error:', error);
       });
