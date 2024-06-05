@@ -128,8 +128,9 @@ class Whiteboard {
             const boardWidth = parseFloat(this.htmlElement.getAttribute('width'));
             const boardHeight = parseFloat(this.htmlElement.getAttribute('height'));
             intersection.point.z += 0;
-            intersection.point.x = Math.round((intersection.point.x + boardWidth / 2) / this.tileSize) * this.tileSize - boardWidth / 2;
-            intersection.point.y = Math.round((intersection.point.y + boardHeight / 2) / this.tileSize) * this.tileSize - boardHeight / 2;
+            const { gridX, gridY } = this.#getGridCoords(intersection);
+            intersection.point.x = gridX * this.tileSize - boardWidth / 2;
+            intersection.point.y = gridY * this.tileSize - boardHeight / 2;
             this.shadowEl.setAttribute('position', intersection.point);
         }
         else {
