@@ -36,7 +36,6 @@ class CircuitElement {
 
     setActive(active){
         this.active = active;
-        console.log(active);
         if(active){
             this.htmlElt.setAttribute('color', '#00ff00');
         }else{
