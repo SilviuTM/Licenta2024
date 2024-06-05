@@ -13,6 +13,7 @@ class Whiteboard {
     this.grid = this.#initGrid();
     this.shadowEl = null;
     this.shadowElShape = null;
+    this.animationInterval = null;
     console.log('rows and cols', this.rows, this.cols);
   }
 
@@ -181,9 +182,16 @@ class Whiteboard {
   }
 
 
-  startAnimation(elt) {
-    elt.innerHTML = 'Stop';
-    setInterval(this.sendGrid.bind(this), 1000);
+  toggleAnimation(elt) {
+    if(this.animationInterval == null) {
+      elt.innerHTML = 'Stop';
+      this.animationInterval = setInterval(this.sendGrid.bind(this), 1000);
+    }
+    else {
+      elt.innerHTML = 'Start';
+      clearInterval(this.animationInterval);
+      this.animationInterval = null;
+    }
   }
 
   sendGrid() {
