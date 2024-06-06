@@ -25,6 +25,8 @@ class CircuitElement {
         this.shadow = false;
         this.htmlElt = this.#buildHtmlElement();
         this.active = false;
+        this.rotation = 0;
+        this.isturnedon = false;
     }
 
     setShadow() {
@@ -34,13 +36,26 @@ class CircuitElement {
        this.htmlElt.setAttribute('class', classes + ' shadow');
     }
 
-    setActive(active){
+    setActive(active) {
         this.active = active;
         if(active){
             this.htmlElt.setAttribute('color', '#00ff00');
         }else{
             this.htmlElt.setAttribute('color', '#ff0000');
         }
+    }
+
+    setRotation(rotation) {
+        this.rotation = rotation;
+        this.htmlElt.setAttribute('rotation', `0 0 ${rotation}`);
+    }
+
+    setIsTurnedOn(turnedOn) {
+        this.isturnedon = turnedOn;
+    }
+
+    updateTexture() {
+
     }
 
     #buildHtmlElement() {
@@ -89,7 +104,7 @@ class Baterie extends CircuitElement {
 class Intrerupator extends CircuitElement {
     constructor(width, height, depth, intersectionPoint) {
         super(width, height, depth, intersectionPoint);
-        this.img = '#rupator';
+        this.img = '#rupatorOFF';
         this.gridLetter = 's';
         this.htmlElt.setAttribute('material', 'src', this.img);
 
@@ -97,6 +112,16 @@ class Intrerupator extends CircuitElement {
 
     getHtmlElement() {
         return this.htmlElt;
+    }
+
+    updateTexture() {
+        if(this.isturnedon){
+            this.img = '#rupatorON'
+        }else{
+            this.img = '#rupatorOFF'
+        }
+
+        this.htmlElt.setAttribute('material', 'src', this.img);
     }
 }
 
@@ -108,6 +133,10 @@ class Cablu extends CircuitElement {
         this.htmlElt.setAttribute('material', 'src', this.img);
 
 
+    }
+
+    setRotation() {
+        
     }
 
     getHtmlElement() {

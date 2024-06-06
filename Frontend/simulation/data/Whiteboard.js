@@ -45,6 +45,11 @@ class Whiteboard {
     this.handleCabluGraphics(Y, X - 1);
   }
 
+  #getIntersection() {
+    const cursorEl = document.querySelector('#cursor');
+    return cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+  }
+
   #getGridCoords(intersection) {
     // in caz ca va fi vreodata nevoie de hitbox cu alt format decat 1:1
     const boardWidth = Number.parseFloat(this.htmlElement.getAttribute('width'));
@@ -60,8 +65,7 @@ class Whiteboard {
 
   #handleDelete() {
     const sceneEl = document.querySelector('a-scene');
-    const cursorEl = document.querySelector('#cursor');
-    const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+    const intersection = this.#getIntersection()
     if (intersection) {
       const { gridX, adjustedGridY } = this.#getGridCoords(intersection);
       if (this.grid[adjustedGridY][gridX].gridLetter != '0') {
@@ -72,6 +76,27 @@ class Whiteboard {
     }
   }
 
+  #handleRotation() {
+    const intersection = this.#getIntersection()
+    if (intersection) {
+      const { gridX, adjustedGridY } = this.#getGridCoords(intersection);
+      if (this.grid[adjustedGridY][gridX].gridLetter != '0') {
+        this.grid[adjustedGridY][gridX].setRotation((this.grid[adjustedGridY][gridX].rotation + 90) % 360);
+        this.#evaluateCablus(adjustedGridY, gridX);
+      }
+    }
+  }
+
+  #handleTurnOn() {
+    const intersection = this.#getIntersection()
+    if (intersection) {
+      const { gridX, adjustedGridY } = this.#getGridCoords(intersection);
+      if (this.grid[adjustedGridY][gridX].gridLetter != '0') {
+        this.grid[adjustedGridY][gridX].setIsTurnedOn(!this.grid[adjustedGridY][gridX].isturnedon);
+        this.grid[adjustedGridY][gridX].updateTexture();
+      }
+    }
+  }
 
 
   setShape(shape, el) {
@@ -101,7 +126,8 @@ class Whiteboard {
   placeShadowShape() {
     const sceneEl = document.querySelector('a-scene');
     const cursorEl = document.querySelector('#cursor');
-    if (this.currentShape === 'none' || this.currentShape === 'delete') {
+    if (this.currentShape === 'none' || this.currentShape === 'delete' || 
+        this.currentShape === 'turnon' || this.currentShape === 'rotate') {
       RemoveIfExists({ parent: sceneEl, child: this.shadowEl });
       this.shadowEl = null;
       return;
@@ -155,6 +181,18 @@ class Whiteboard {
       this.#handleDelete();
       return;
     }
+
+    if (this.currentShape === 'rotate') {
+      this.#handleRotation();
+      return;
+    }
+
+    if (this.currentShape === 'turnon') {
+      this.#handleTurnOn();
+      return;
+    }
+
+
     const sceneEl = document.querySelector('a-scene');
     const shapeData = this.#getShapeEl();
     if (shapeData) {
@@ -169,7 +207,7 @@ class Whiteboard {
         sceneEl.appendChild(shapeEl.htmlElt);
       }
     }
-    // console.log(this.grid);
+    console.log(this.grid);
   }
 
   #handleReceivedData(data) {
@@ -177,6 +215,8 @@ class Whiteboard {
       for (let j = 0; j < data[i].length; j++) {
         if (data[i][j].letter !== '0') {
           this.grid[i][j].setActive(data[i][j].active);
+          //this.grid[i][j].setRotation(data[i][j].rotation);
+          //this.grid[i][j].setIsTurnedOn(data[i][j].isturnedon);
         }
       }
     }
@@ -197,7 +237,7 @@ class Whiteboard {
 
   sendGrid() {
     const newGrid = this.grid.map((row) => row.map((cell) => {
-      return { Letter: cell.gridLetter, Active: cell.active }
+      return { Letter: cell.gridLetter, Active: cell.active, Rotation: cell.rotation, IsTurnedOn: cell.isturnedon }
     }));
 
     fetch('https://localhost:7268/simulate', {
@@ -219,11 +259,34 @@ class Whiteboard {
     if (col < 0 || col >= this.cols) return;
     if (this.grid[row][col].gridLetter != 'c') return;
 
+
     let hasLeft = false, hasRight = false, hasUp = false, hasDown = false;
-    if (row - 1 >= 0 && this.grid[row - 1][col].gridLetter != '0') hasUp = true;
-    if (row + 1 < this.rows && this.grid[row + 1][col].gridLetter != '0') hasDown = true;
-    if (col - 1 >= 0 && this.grid[row][col - 1].gridLetter != '0') hasLeft = true;
-    if (col + 1 < this.cols && this.grid[row][col + 1].gridLetter != '0') hasRight = true;
+    // check upwards
+    if (row - 1 >= 0 && this.grid[row - 1][col].gridLetter != '0')
+      if ((this.grid[row - 1][col].rotation != 90 && this.grid[row - 1][col].rotation != 270) 
+        || this.grid[row - 1][col].gridLetter === 'c') 
+        hasUp = true;
+
+    // check downwards
+    if (row + 1 < this.rows && this.grid[row + 1][col].gridLetter != '0')
+      if ((this.grid[row + 1][col].rotation != 90 && this.grid[row + 1][col].rotation != 270) 
+        || this.grid[row + 1][col].gridLetter === 'c') 
+         hasDown = true;
+
+    // check leftwards
+    if (col - 1 >= 0 && this.grid[row][col - 1].gridLetter != '0')
+      if ((this.grid[row][col - 1].rotation != 0 && this.grid[row][col - 1].rotation != 180) 
+        || this.grid[row][col - 1].gridLetter === 'c') 
+         hasLeft = true;
+
+    // check rightwards
+    if (col + 1 < this.cols && this.grid[row][col + 1].gridLetter != '0')
+      if ((this.grid[row][col + 1].rotation != 0 && this.grid[row][col + 1].rotation != 180) 
+        || this.grid[row][col + 1].gridLetter === 'c') 
+         hasRight = true;
+
+
+
 
     if (hasUp == true && hasDown == true && hasLeft == true && hasRight == true) // +
       this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-all')
