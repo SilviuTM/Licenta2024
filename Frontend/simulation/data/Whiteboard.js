@@ -93,7 +93,6 @@ class Whiteboard {
       const { gridX, adjustedGridY } = this.#getGridCoords(intersection);
       if (this.grid[adjustedGridY][gridX].gridLetter != '0') {
         this.grid[adjustedGridY][gridX].setIsTurnedOn(!this.grid[adjustedGridY][gridX].isturnedon);
-        this.grid[adjustedGridY][gridX].updateTexture();
       }
     }
   }
@@ -115,7 +114,8 @@ class Whiteboard {
       intersection.point.y = gridY * this.tileSize - boardHeight / 2;
 
 
-      const shapeEl = CircuitElementFactory.getShape(this.currentShape, intersection.point, this.tileSize);
+      const scale = this.tileSize / boardHeight;
+      const shapeEl = CircuitElementFactory.getShape(this.currentShape, intersection.point, this.tileSize, scale);
       if (!!props && props.isShadow) {
         shapeEl.setShadow();
       }

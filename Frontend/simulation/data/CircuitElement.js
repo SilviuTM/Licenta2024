@@ -23,7 +23,7 @@ class CircuitElement {
         this.classes = 'deletable';
         this.bodyType = 'dynamic-body';
         this.shadow = false;
-        this.htmlElt = this.#buildHtmlElement();
+        this.htmlElt = this.buildHtmlElement();
         this.active = false;
         this.rotation = 0;
         this.isturnedon = false;
@@ -52,13 +52,14 @@ class CircuitElement {
 
     setIsTurnedOn(turnedOn) {
         this.isturnedon = turnedOn;
+        this.updateTexture();
     }
 
     updateTexture() {
 
     }
 
-    #buildHtmlElement() {
+    buildHtmlElement() {
         const html = document.createElement('a-box');
         html.setAttribute('width', this.width);
         html.setAttribute('height', this.height);
@@ -76,38 +77,65 @@ class CircuitElement {
 
 
 class Bec extends CircuitElement {
-    constructor(width, height, depth, intersectionPoint) {
+    constructor(width, height, depth, intersectionPoint, scale) {
         super(width, height, depth, intersectionPoint);
-        this.img = '#bec';
+        this.img = '#becMODEL';
         this.gridLetter = 'l';
-        this.htmlElt.setAttribute('material', 'src', this.img);
+
+        this.htmlElt.setAttribute('gltf-model', this.img);
+        this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
     }
 
     getHtmlElement() {
         return this.htmlElt;
+    }
+
+    buildHtmlElement() {
+        const html = document.createElement('a-entity');
+        html.setAttribute('width', this.width);
+        html.setAttribute('height', this.height);
+        html.setAttribute('depth', this.depth);
+        html.setAttribute('position', this.position);
+        html.setAttribute('class', this.classes);
+        html.setAttribute(this.bodyType, '');
+        return html;
     }
 }
 
 class Baterie extends CircuitElement {
-    constructor(width, height, depth, intersectionPoint) {
+    constructor(width, height, depth, intersectionPoint, scale) {
         super(width, height, depth, intersectionPoint);
-        this.img = '#baterie';
+        this.img = '#baterieMODEL';
         this.gridLetter = 'b';
-        this.htmlElt.setAttribute('material', 'src', this.img);
+        
+        this.htmlElt.setAttribute('gltf-model', this.img);
+        this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
     }
 
     getHtmlElement() {
         return this.htmlElt;
     }
+
+    buildHtmlElement() {
+        const html = document.createElement('a-entity');
+        html.setAttribute('width', this.width);
+        html.setAttribute('height', this.height);
+        html.setAttribute('depth', this.depth);
+        html.setAttribute('position', this.position);
+        html.setAttribute('class', this.classes);
+        html.setAttribute(this.bodyType, '');
+        return html;
+    }
 }
 
 class Intrerupator extends CircuitElement {
-    constructor(width, height, depth, intersectionPoint) {
+    constructor(width, height, depth, intersectionPoint, scale) {
         super(width, height, depth, intersectionPoint);
-        this.img = '#rupatorOFF';
+        this.img = '#rupatorOFFMODEL';
         this.gridLetter = 's';
-        this.htmlElt.setAttribute('material', 'src', this.img);
-
+        
+        this.htmlElt.setAttribute('gltf-model', this.img);
+        this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
     }
 
     getHtmlElement() {
@@ -116,17 +144,28 @@ class Intrerupator extends CircuitElement {
 
     updateTexture() {
         if(this.isturnedon){
-            this.img = '#rupatorON'
+            this.img = '#rupatorONMODEL'
         }else{
-            this.img = '#rupatorOFF'
+            this.img = '#rupatorOFFMODEL'
         }
 
-        this.htmlElt.setAttribute('material', 'src', this.img);
+        this.htmlElt.setAttribute('gltf-model', this.img);
+    }
+
+    buildHtmlElement() {
+        const html = document.createElement('a-entity');
+        html.setAttribute('width', this.width);
+        html.setAttribute('height', this.height);
+        html.setAttribute('depth', this.depth);
+        html.setAttribute('position', this.position);
+        html.setAttribute('class', this.classes);
+        html.setAttribute(this.bodyType, '');
+        return html;
     }
 }
 
 class Cablu extends CircuitElement {
-    constructor(width, height, depth, intersectionPoint) {
+    constructor(width, height, depth, intersectionPoint, scale) {
         super(width, height, depth, intersectionPoint);
         this.img = '#W-none';
         this.gridLetter = 'c';
@@ -145,17 +184,17 @@ class Cablu extends CircuitElement {
 }
 
 class CircuitElementFactory{
-    static getShape(shapeType, intersectionPoint, hitbox){
+    static getShape(shapeType, intersectionPoint, hitbox, scale){
         
         switch(shapeType){
             case 'bec':
-                return new Bec(hitbox, hitbox, hitbox, intersectionPoint);
+                return new Bec(hitbox, hitbox, hitbox, intersectionPoint, scale);
             case 'baterie':
-                return new Baterie(hitbox, hitbox, hitbox, intersectionPoint);
+                return new Baterie(hitbox, hitbox, hitbox, intersectionPoint, scale);
             case 'intrerupator':
-                return new Intrerupator(hitbox, hitbox, hitbox, intersectionPoint);
+                return new Intrerupator(hitbox, hitbox, hitbox, intersectionPoint, scale);
             case 'cablu':
-                return new Cablu(hitbox, hitbox, hitbox, intersectionPoint);
+                return new Cablu(hitbox, hitbox, hitbox, intersectionPoint, scale);
         }
     }
 }
