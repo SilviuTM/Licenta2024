@@ -1,5 +1,10 @@
 using Licenta;
+using Licenta.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +28,31 @@ builder.Services.AddCors(options =>
         {
             builder.AllowAnyOrigin()
                    .AllowAnyHeader()
-                   .AllowAnyMethod();
+            .AllowAnyMethod();
         });
 });
+
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+var jwtkey = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(jwtkey),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
+
+/// BUILD APP
 
 var app = builder.Build();
 app.UseCors("AllowAllOrigins");
@@ -39,15 +66,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/simulate", ([FromBody] CircuitElement[][] mat) =>
-{
-    Simulator.ResetCircuit(mat);
-    Simulator.Simulate(mat);
+app.UseRouting();
 
-    return mat;
-})
-.WithName("Licenta")
-.WithOpenApi();
+app.UseAuthentication();
+app.UseAuthorization();
+
+//app.UseEndpoints(endpoints =>
+//{
+//    endpoints.MapControllers();
+//});
 
 app.Run();
-
