@@ -131,11 +131,18 @@ class Baterie extends CircuitElement {
 class Intrerupator extends CircuitElement {
     constructor(width, height, depth, intersectionPoint, scale) {
         super(width, height, depth, intersectionPoint);
-        this.img = '#rupatorOFFMODEL';
+        this.img = '#rupatorMODEL';
         this.gridLetter = 's';
+
+        this.classes = this.classes + ' ' + 'animation-mixer';
         
         this.htmlElt.setAttribute('gltf-model', this.img);
         this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
+
+        this.htmlElt.setAttribute('animation-mixer','timeScale: 10;');
+        this.htmlElt.setAttribute('animation-mixer','clampWhenFinished: true;');
+        this.htmlElt.setAttribute('animation-mixer','clip: Opening;');
+        this.htmlElt.setAttribute('animation-mixer','loop: once;');
     }
 
     getHtmlElement() {
@@ -144,12 +151,10 @@ class Intrerupator extends CircuitElement {
 
     updateTexture() {
         if(this.isturnedon){
-            this.img = '#rupatorONMODEL'
+            this.htmlElt.setAttribute('animation-mixer','clip: Closing;');
         }else{
-            this.img = '#rupatorOFFMODEL'
+            this.htmlElt.setAttribute('animation-mixer','clip: Opening;');
         }
-
-        this.htmlElt.setAttribute('gltf-model', this.img);
     }
 
     buildHtmlElement() {
@@ -167,15 +172,26 @@ class Intrerupator extends CircuitElement {
 class Cablu extends CircuitElement {
     constructor(width, height, depth, intersectionPoint, scale) {
         super(width, height, depth, intersectionPoint);
-        this.img = '#W-none';
+        this.img = '#firCentruMODEL';
         this.gridLetter = 'c';
-        this.htmlElt.setAttribute('material', 'src', this.img);
 
-
+        this.htmlElt.setAttribute('gltf-model', this.img);
+        this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
     }
 
     setRotation() {
-        
+        // Overwrite ca sa nu faca nimic functia. Nu sterge.
+    }
+
+    buildHtmlElement() {
+        const html = document.createElement('a-entity');
+        html.setAttribute('width', this.width);
+        html.setAttribute('height', this.height);
+        html.setAttribute('depth', this.depth);
+        html.setAttribute('position', this.position);
+        html.setAttribute('class', this.classes);
+        html.setAttribute(this.bodyType, '');
+        return html;
     }
 
     getHtmlElement() {

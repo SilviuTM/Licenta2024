@@ -126,8 +126,8 @@ class Whiteboard {
   placeShadowShape() {
     const sceneEl = document.querySelector('a-scene');
     const cursorEl = document.querySelector('#cursor');
-    if (this.currentShape === 'none' || this.currentShape === 'delete' || 
-        this.currentShape === 'turnon' || this.currentShape === 'rotate') {
+    if (this.currentShape === 'none' || this.currentShape === 'delete' ||
+      this.currentShape === 'turnon' || this.currentShape === 'rotate') {
       RemoveIfExists({ parent: sceneEl, child: this.shadowEl });
       this.shadowEl = null;
       return;
@@ -201,7 +201,7 @@ class Whiteboard {
       this.grid[adjustedGridY][gridX].gridLetter = shapeEl.gridLetter;
       console.log('grid', adjustedGridY, gridX);
       if (!!shapeEl) {
-        RemoveIfExists({ parent: sceneEl, child: this.grid[adjustedGridY][gridX].htmlElt  });
+        RemoveIfExists({ parent: sceneEl, child: this.grid[adjustedGridY][gridX].htmlElt });
         this.grid[adjustedGridY][gridX] = shapeEl;
         this.#evaluateCablus(adjustedGridY, gridX);
         sceneEl.appendChild(shapeEl.htmlElt);
@@ -224,7 +224,7 @@ class Whiteboard {
 
 
   toggleAnimation(elt) {
-    if(this.animationInterval == null) {
+    if (this.animationInterval == null) {
       elt.innerHTML = 'Stop';
       this.animationInterval = setInterval(this.sendGrid.bind(this), 1000);
     }
@@ -263,77 +263,58 @@ class Whiteboard {
     let hasLeft = false, hasRight = false, hasUp = false, hasDown = false;
     // check upwards
     if (row - 1 >= 0 && this.grid[row - 1][col].gridLetter != '0')
-      if ((this.grid[row - 1][col].rotation != 90 && this.grid[row - 1][col].rotation != 270) 
-        || this.grid[row - 1][col].gridLetter === 'c') 
+      if ((this.grid[row - 1][col].rotation != 90 && this.grid[row - 1][col].rotation != 270)
+        || this.grid[row - 1][col].gridLetter === 'c')
         hasUp = true;
 
     // check downwards
     if (row + 1 < this.rows && this.grid[row + 1][col].gridLetter != '0')
-      if ((this.grid[row + 1][col].rotation != 90 && this.grid[row + 1][col].rotation != 270) 
-        || this.grid[row + 1][col].gridLetter === 'c') 
-         hasDown = true;
+      if ((this.grid[row + 1][col].rotation != 90 && this.grid[row + 1][col].rotation != 270)
+        || this.grid[row + 1][col].gridLetter === 'c')
+        hasDown = true;
 
     // check leftwards
     if (col - 1 >= 0 && this.grid[row][col - 1].gridLetter != '0')
-      if ((this.grid[row][col - 1].rotation != 0 && this.grid[row][col - 1].rotation != 180) 
-        || this.grid[row][col - 1].gridLetter === 'c') 
-         hasLeft = true;
+      if ((this.grid[row][col - 1].rotation != 0 && this.grid[row][col - 1].rotation != 180)
+        || this.grid[row][col - 1].gridLetter === 'c')
+        hasLeft = true;
 
     // check rightwards
     if (col + 1 < this.cols && this.grid[row][col + 1].gridLetter != '0')
-      if ((this.grid[row][col + 1].rotation != 0 && this.grid[row][col + 1].rotation != 180) 
-        || this.grid[row][col + 1].gridLetter === 'c') 
-         hasRight = true;
+      if ((this.grid[row][col + 1].rotation != 0 && this.grid[row][col + 1].rotation != 180)
+        || this.grid[row][col + 1].gridLetter === 'c')
+        hasRight = true;
 
+      
+    // delete all children and recreate
+    RemoveAllChildren(this.grid[row][col].htmlElt);
 
+    if (hasUp == true) {
+      const newHTML = document.createElement('a-entity');
+      newHTML.setAttribute('gltf-model', '#firSusMODEL');
 
+      this.grid[row][col].htmlElt.appendChild(newHTML);
+    }
 
-    if (hasUp == true && hasDown == true && hasLeft == true && hasRight == true) // +
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-all')
+    if (hasDown == true) {
+      const newHTML = document.createElement('a-entity');
+      newHTML.setAttribute('gltf-model', '#firJosMODEL');
 
-    else if (hasDown == true && hasLeft == true && hasRight == true) // T - 0
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-T0')
+      this.grid[row][col].htmlElt.appendChild(newHTML);
+    }
 
-    else if (hasUp == true && hasDown == true && hasLeft == true) // T - 90
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-T90')
+    if (hasRight == true) {
+      const newHTML = document.createElement('a-entity');
+      newHTML.setAttribute('gltf-model', '#firDreaptaMODEL');
 
-    else if (hasUp == true && hasLeft == true && hasRight == true) // T - 180
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-T180')
+      this.grid[row][col].htmlElt.appendChild(newHTML);
+    }
 
-    else if (hasUp == true && hasDown == true && hasRight == true) // T - 270
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-T270')
+    if (hasLeft == true) {
+      const newHTML = document.createElement('a-entity');
+      newHTML.setAttribute('gltf-model', '#firStangaMODEL');
 
-    else if (hasUp == true && hasDown == true) // I - V
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-IV')
-
-    else if (hasLeft == true && hasRight == true) // I - H
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-IH')
-
-    else if (hasUp == true && hasRight == true) // L - 0
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-L0')
-
-    else if (hasDown == true && hasRight == true) // L - 90
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-L90')
-
-    else if (hasDown == true && hasLeft == true) // L - 180
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-L180')
-
-    else if (hasUp == true && hasLeft == true) // L - 270
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-L270')
-
-    else if (hasUp == true) // single - Up
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-1U')
-
-    else if (hasDown == true) // single - Down
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-1D')
-
-    else if (hasLeft == true) // single - Left
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-1L')
-
-    else if (hasRight == true) // single - Right
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-1R')
-
-    else // none
-      this.grid[row][col].htmlElt.setAttribute('material', 'src', '#W-none')
+      this.grid[row][col].htmlElt.appendChild(newHTML);
+    }
   }
 }

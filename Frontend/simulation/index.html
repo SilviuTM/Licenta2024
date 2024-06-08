@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>A-Frame Physics Example with Shape Selection and Deletion</title>
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
   <!-- <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script> -->
   <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
   <script src="./data/utils.js"></script>
@@ -32,33 +33,16 @@
       <!-- Environment-->
       <a-assets>
         <img id="skybox" src="./img/clasa1500.png">
-        <img id="rupatorON" src="./img/rupatorON.png">
-        <img id="rupatorOFF" src="./img/rupatorOFF.png">
-        <img id="bec" src="./img/idea.png">
-        <img id="baterie" src="./img/baterie.jpg">
-        <!-- Wires -->
-        <img id="W-none" src="./img/none.png">
-        <img id="W-1U" src="./img/oneU.png">
-        <img id="W-1D" src="./img/oneD.png">
-        <img id="W-1R" src="./img/oneR.png">
-        <img id="W-1L" src="./img/oneL.png">
-        <img id="W-IH" src="./img/lineH.png">
-        <img id="W-IV" src="./img/lineV.png">
-        <img id="W-L0" src="./img/L0.png">
-        <img id="W-L90" src="./img/L90.png">
-        <img id="W-L180" src="./img/L180.png">
-        <img id="W-L270" src="./img/L270.png">
-        <img id="W-T0" src="./img/T0.png">
-        <img id="W-T90" src="./img/T90.png">
-        <img id="W-T180" src="./img/T180.png">
-        <img id="W-T270" src="./img/T270.png">
-        <img id="W-all" src="./img/plus.png">
         
         <a-asset-item id="blackboard" src="./img/bb.glb"></a-asset-item>
         <a-asset-item id="becMODEL" src="./img/bec.glb"></a-asset-item>
         <a-asset-item id="baterieMODEL" src="./img/baterie.glb"></a-asset-item>
-        <a-asset-item id="rupatorONMODEL" src="./img/rupatorON.glb"></a-asset-item>
-        <a-asset-item id="rupatorOFFMODEL" src="./img/rupatorOFF.glb"></a-asset-item>
+        <a-asset-item id="rupatorMODEL" src="./img/rupator.glb"></a-asset-item>
+        <a-asset-item id="firCentruMODEL" src="./img/WireCenter.glb"></a-asset-item>
+        <a-asset-item id="firSusMODEL" src="./img/WireUp.glb"></a-asset-item>
+        <a-asset-item id="firJosMODEL" src="./img/WireDown.glb"></a-asset-item>
+        <a-asset-item id="firStangaMODEL" src="./img/WireRight.glb"></a-asset-item>
+        <a-asset-item id="firDreaptaMODEL" src="./img/WireLeft.glb"></a-asset-item>
       </a-assets>
       <a-sky src="#skybox"></a-sky>
 
