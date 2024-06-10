@@ -262,30 +262,73 @@ class Whiteboard {
 
     let hasLeft = false, hasRight = false, hasUp = false, hasDown = false;
     // check upwards
-    if (row - 1 >= 0 && this.grid[row - 1][col].gridLetter != '0')
+    if (row - 1 >= 0 && this.grid[row - 1][col].gridLetter != '0') {
+      // check regular comps
       if ((this.grid[row - 1][col].rotation != 90 && this.grid[row - 1][col].rotation != 270)
-        || this.grid[row - 1][col].gridLetter === 'c')
+        && (this.grid[row - 1][col].gridLetter !== 'S' && this.grid[row - 1][col].gridLetter !== 't'))
         hasUp = true;
 
+      // check wire
+      if (this.grid[row - 1][col].gridLetter === 'c')
+        hasUp = true;
+
+      // check alternate switch and transistor
+      if ((this.grid[row - 1][col].gridLetter === 'S' || this.grid[row - 1][col].gridLetter === 't') &&
+         this.grid[row - 1][col].rotation != 180)
+        hasUp = true;
+    }
+
     // check downwards
-    if (row + 1 < this.rows && this.grid[row + 1][col].gridLetter != '0')
+    if (row + 1 < this.rows && this.grid[row + 1][col].gridLetter != '0') {
+      // check regular comps
       if ((this.grid[row + 1][col].rotation != 90 && this.grid[row + 1][col].rotation != 270)
-        || this.grid[row + 1][col].gridLetter === 'c')
+        && (this.grid[row + 1][col].gridLetter !== 'S' && this.grid[row + 1][col].gridLetter !== 't'))
         hasDown = true;
 
+      // check wire
+      if (this.grid[row + 1][col].gridLetter === 'c')
+        hasDown = true;
+
+      // check alternate switch and transistor
+      if ((this.grid[row + 1][col].gridLetter === 'S' || this.grid[row + 1][col].gridLetter === 't') && 
+        this.grid[row + 1][col].rotation != 0)
+        hasDown = true;
+    }
+
     // check leftwards
-    if (col - 1 >= 0 && this.grid[row][col - 1].gridLetter != '0')
+    if (col - 1 >= 0 && this.grid[row][col - 1].gridLetter != '0') {
+      // check regular comps
       if ((this.grid[row][col - 1].rotation != 0 && this.grid[row][col - 1].rotation != 180)
-        || this.grid[row][col - 1].gridLetter === 'c')
+        && (this.grid[row][col - 1].gridLetter !== 'S' && this.grid[row][col - 1].gridLetter !== 't'))
         hasLeft = true;
 
+      // check wire
+      if (this.grid[row][col - 1].gridLetter === 'c')
+        hasLeft = true;
+
+      // check alternate switch and transistor
+      if ((this.grid[row][col - 1].gridLetter === 'S' || this.grid[row][col - 1].gridLetter === 't') &&
+         this.grid[row][col - 1].rotation != 270)
+        hasLeft = true;
+    }
+
     // check rightwards
-    if (col + 1 < this.cols && this.grid[row][col + 1].gridLetter != '0')
-      if ((this.grid[row][col + 1].rotation != 0 && this.grid[row][col + 1].rotation != 180)
-        || this.grid[row][col + 1].gridLetter === 'c')
+    if (col + 1 < this.cols && this.grid[row][col + 1].gridLetter != '0') {
+      // check regular comps
+      if ((this.grid[row][col + 1].rotation != 0 && this.grid[row][col + 1].rotation != 180) 
+        && (this.grid[row][col + 1].gridLetter !== 'S' && this.grid[row][col + 1].gridLetter !== 't'))
         hasRight = true;
 
-      
+      // check wire
+      if (this.grid[row][col + 1].gridLetter === 'c')
+        hasRight = true;
+
+      // check alternate switch and transistor
+      if ((this.grid[row][col + 1].gridLetter === 'S' || this.grid[row][col + 1].gridLetter === 't') &&
+         this.grid[row][col + 1].rotation != 90)
+        hasRight = true;
+    }
+
     // delete all children and recreate
     RemoveAllChildren(this.grid[row][col].htmlElt);
 
