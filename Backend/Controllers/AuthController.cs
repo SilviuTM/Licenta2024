@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Licenta.Models;
 
-[Route("[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {

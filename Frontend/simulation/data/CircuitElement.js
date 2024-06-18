@@ -4,10 +4,7 @@ class Position {
         this.y = y;
         this.z = z;
     }
-
 }
-
-
 
 class CircuitElement {
     constructor(width, height, depth, intersectionPoint) {
@@ -27,6 +24,11 @@ class CircuitElement {
         this.active = false;
         this.rotation = 0;
         this.isturnedon = false;
+        this.volt = 0;
+        this.intensity = 0;
+        this.resistance = 0.0000001;
+        this.currentFrom = [];
+        this.currentTo = [];
     }
 
     setShadow() {
@@ -71,6 +73,9 @@ class CircuitElement {
         return html;
     }
 
+    animateCurrent() {
+        
+    }
 }
 
 
@@ -84,6 +89,12 @@ class Bec extends CircuitElement {
 
         this.htmlElt.setAttribute('gltf-model', this.img);
         this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
+
+        const rezistenta = document.getElementById('becNumber');
+        if (rezistenta.value === "")
+            this.resistance = 1;
+        else
+            this.resistance = +rezistenta.value;
     }
 
     getHtmlElement() {
@@ -110,6 +121,12 @@ class Baterie extends CircuitElement {
 
         this.htmlElt.setAttribute('gltf-model', this.img);
         this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
+
+        const voltaj = document.getElementById('baterieNumber');
+        if (voltaj.value === "")
+            this.volt = 1;
+        else
+            this.volt = +voltaj.value;
     }
 
     getHtmlElement() {
@@ -218,6 +235,12 @@ class Rezistor extends CircuitElement {
 
         this.htmlElt.setAttribute('gltf-model', this.img);
         this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
+
+        const rezistenta = document.getElementById('rezistorNumber');
+        if (rezistenta.value === "")
+            this.resistance = 1;
+        else
+            this.resistance = +rezistenta.value;
     }
 
     getHtmlElement() {
@@ -296,6 +319,8 @@ class Voltmetru extends CircuitElement {
 
         this.htmlElt.setAttribute('gltf-model', this.img);
         this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
+
+        this.resistance = 999999999;
     }
 
     getHtmlElement() {
@@ -425,5 +450,3 @@ class CircuitElementFactory {
         }
     }
 }
-
-

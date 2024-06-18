@@ -3,12 +3,21 @@
     public class CircuitElement
     {
         public char Letter {get;set;}
+
         public bool Active { get; set; }
-        // not implemented yet
-        public int Intensity { get; set; }
-        public int Amplitude { get; set; }
-        // intre 0 si 360
+
+        public double Voltage { get; set; }
+
+        public double Amplitude { get; set; }
+
+        public double Resistance { get; set; }
+
         public int Rotation { get; set; } 
+
         public bool IsTurnedOn { get; set; }
+
+        public List<char> currentFrom { get; set; } = [];
+
+        public List<char> currentTo { get; set; } = [];
     }
 }

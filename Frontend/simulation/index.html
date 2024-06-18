@@ -15,22 +15,26 @@
 </head>
 <body>
   <div class="ui-container">
-    <button class="ui-container-btn " onclick="whiteboard.setShape('none',this)">None</button>
-    <button class="ui-container-btn active" onclick="whiteboard.setShape('bec',this)">Place Lightbulb</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('baterie',this)">Place Battery</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('intrerupator',this)">Place Switch</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('intrerupatorAlt',this)">Place Alternative Switch</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('rezistor',this)">Place Resistor</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('tranzistor',this)">Place Transistor</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('amper',this)">Place Ampermeter</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('volt',this)">Place Voltmeter</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('watt',this)">Place Wattmeter</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('ohm',this)">Place Ohmmeter</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('cablu',this)">Place Wire</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('rotate',this)">Rotate Object</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('turnon',this)">Turn Object On/Off</button>
-    <button class="ui-container-btn" onclick="whiteboard.setShape('delete',this)">Delete Object</button>
-    <button class="ui-container-btn" onclick="whiteboard.sendGrid()">Next frame</button>
+    <button class="ui-container-btn " onclick="whiteboard.setShape('none',this)">Nimic</button>
+    <p class="textLabel">-- Componente --</p>
+    <button class="ui-container-btn active" onclick="whiteboard.setShape('bec',this)">Bec
+    <input type="number" class="number-input" id="becNumber" name="becNumber" min="0" max="10000000" step="0.01"> Ω</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('baterie',this)">Baterie
+    <input type="number" class="number-input" id="baterieNumber" name="baterieNumber" min="0" max="10000000" step="0.01"> V</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('intrerupator',this)">Intrerupator</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('intrerupatorAlt',this)">Intrerupator Alternativ</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('rezistor',this)">Rezistor
+    <input type="number" class="number-input" id="rezistorNumber" name="rezistorNumber" min="0" max="10000000" step="0.01"> Ω</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('amper',this)">Ampermetru</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('volt',this)">Voltmetru</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('cablu',this)">Cablu</button>
+    <p class="textLabel">-- Unelte --</p>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('rotate',this)">Roteste Obiect</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('turnon',this)">(Dez)Activeaza</button>
+    <button class="ui-container-btn" onclick="whiteboard.setShape('delete',this)">Sterge</button>
+    <p class="textLabel">-- Simulare --</p>
+    <button class="ui-container-btn" onclick="whiteboard.sendGrid()">Simuleaza</button>
+    <button class="ui-container-btn" onclick="whiteboard.resetAnimations()">Reseteaza Animatii</button>
     <button class="ui-container-btn" onclick="whiteboard.toggleAnimation(this)">Start</button>
 
   </div>

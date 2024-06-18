@@ -25,3 +25,13 @@
     border-style: solid;
     background-color: #a7ff83;
   }
+
+.number-input {
+  height: 20px;
+  width: 70%;
+  text-align: center;
+}
+
+.textLabel {
+  text-align: center;
+}

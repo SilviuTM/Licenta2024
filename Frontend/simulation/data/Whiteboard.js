@@ -1,6 +1,8 @@
 class Whiteboard {
   constructor() {
     this.currentShape = 'bec';
+    this.batteryVoltage = 25;
+    this.resistorOhm = 5;
     this.htmlElement = document.getElementById('whiteboard');
     this.htmlElement.setAttribute('material', 'opacity', 0);
     const height = this.htmlElement.getAttribute('height');
@@ -237,7 +239,9 @@ class Whiteboard {
 
   sendGrid() {
     const newGrid = this.grid.map((row) => row.map((cell) => {
-      return { Letter: cell.gridLetter, Active: cell.active, Rotation: cell.rotation, IsTurnedOn: cell.isturnedon }
+      return { Letter: cell.gridLetter, Active: cell.active, Voltage:cell.volt, 
+               Resistance: cell.resistance, Rotation: cell.rotation, IsTurnedOn: cell.isturnedon,
+               currentFrom: cell.currentFrom, currentTo: cell.currentTo }
     }));
 
     fetch('https://localhost:7268/simulate', {
@@ -252,6 +256,8 @@ class Whiteboard {
       .catch((error) => {
         console.error('Error:', error);
       });
+
+      this.#applyAnimations();
   }
 
   handleCabluGraphics(row, col) {
@@ -359,5 +365,22 @@ class Whiteboard {
 
       this.grid[row][col].htmlElt.appendChild(newHTML);
     }
+  }
+
+  #applyAnimations() {
+    for (let row = 0; row < this.rows; row++)
+      for (let col = 0; col < this.cols; col++)
+        if (this.grid[row][col].htmlElt)
+            this.grid[row][col].animateCurrent();
+  }
+
+  resetAnimations() {
+    for (let row = 0; row < this.rows; row++)
+      for (let col = 0; col < this.cols; col++)
+        if (this.grid[row][col].htmlElt)
+          {
+            RemoveAllChildren(this.grid[row][col].htmlElt);
+            this.#evaluateCablus(row, col);
+          }
   }
 }
