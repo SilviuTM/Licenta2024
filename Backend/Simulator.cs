@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
-using System.Diagnostics;
 
 namespace Licenta
 {
@@ -53,7 +52,7 @@ namespace Licenta
         /// P = V * I
         /// 
         /// Voltmetru = R inf
-        /// Ampermetru = R 0.00000001
+        /// Ampermetru = R 0
         /// 
         /// Any node can be ground, just make sure to add the lowest number < 0 to all volts so that min becomes 0
         /// 
@@ -73,7 +72,7 @@ namespace Licenta
         /// We will add their other wire end to the list.
         /// When we find a wire end that has the initial battery (bad end), but when list runs out (good end)
 
-        /// For Silviu in the future, please:
+        /// For Future Silviu, please:
         /// 1. Create nodes and branches
         /// 2. Check validity for the 2 problems explained earlier
         /// 3. Do MNA
@@ -226,7 +225,7 @@ namespace Licenta
             return false;
         }
 
-        // better rewrites
+        // worse rewrites
         public bool CheckValidDirection(CircuitElement[][] circuit, int row, int col)
         {
             return false;
@@ -648,7 +647,7 @@ namespace Licenta
         /// PILLAR 3: MODIFIED NODAL ANALYSIS
         public double[] ModifiedNodalAnalysis()
         {
-            int n = componentDict.Values.Count(x => x.element.Letter != 'b');
+            int n = nodes.Count - 1;
             int m = batteries.Count;
 
             double[,] AMatrix = new double[n + m, n + m];
@@ -705,10 +704,10 @@ namespace Licenta
                 batteries[i - n].element.Amplitude = X[i, 0];
 
             // nodes
-            for (int i = 0; i < n; i++)
+            for (int i = 1; i < n + 1; i++)
             {
-                nodes[i + 1].voltage = X[i, 0];
-                nodes[i + 1].SetAllVolts();
+                nodes[i].voltage = X[i - 1, 0];
+                nodes[i].SetAllVolts();
             }
 
             return [];
@@ -719,10 +718,10 @@ namespace Licenta
             double[,] matrix = new double[n, n];
 
             // fill in diagonal (sum of conductances per node)
-            for (int i = 1; i < nodes.Count; i++)
+            for (int i = 0; i < n; i++)
             {
-                foreach (Component c in nodes[i].ends.FindAll(x => x.element.Letter != 'b'))
-                    matrix[i - 1, i - 1] += 1.0 / c.element.Resistance;
+                foreach (Component c in nodes[i + 1].ends.FindAll(x => x.element.Letter != 'b'))
+                    matrix[i, i] += 1.0 / c.element.Resistance;
             }
 
             // fill in offdiagonal (for each component in the circuit)

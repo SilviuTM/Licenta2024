@@ -16,6 +16,10 @@ class Whiteboard {
     this.shadowEl = null;
     this.shadowElShape = null;
     this.animationInterval = null;
+
+    this.inVR = false;
+
+    this.circuitValid = true;
     console.log('rows and cols', this.rows, this.cols);
   }
 
@@ -48,8 +52,14 @@ class Whiteboard {
   }
 
   #getIntersection() {
-    const cursorEl = document.querySelector('#cursor');
-    return cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+    if (this.inVR === false) {
+      const cursorEl = document.querySelector('#cursor');
+      return cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+    }
+    else {
+      const handEl = document.querySelector('#hand');
+      return handEl.components.raycaster.getIntersection(document.getElementById('whiteboard'));
+    }
   }
 
   #getGridCoords(intersection) {
@@ -106,8 +116,7 @@ class Whiteboard {
   }
 
   #getShapeEl(props) {
-    const cursorEl = document.querySelector('#cursor');
-    const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+    const intersection = this.#getIntersection();
     if (intersection) {
       const boardWidth = Number.parseFloat(this.htmlElement.getAttribute('width'));
       const boardHeight = Number.parseFloat(this.htmlElement.getAttribute('height'));
@@ -127,7 +136,6 @@ class Whiteboard {
 
   placeShadowShape() {
     const sceneEl = document.querySelector('a-scene');
-    const cursorEl = document.querySelector('#cursor');
     if (this.currentShape === 'none' || this.currentShape === 'delete' ||
       this.currentShape === 'turnon' || this.currentShape === 'rotate') {
       RemoveIfExists({ parent: sceneEl, child: this.shadowEl });
@@ -152,7 +160,7 @@ class Whiteboard {
         sceneEl.appendChild(this.shadowEl);
       }
     } else {
-      const intersection = cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+      const intersection = this.#getIntersection();
       if (intersection) {
         const boardWidth = parseFloat(this.htmlElement.getAttribute('width'));
         const boardHeight = parseFloat(this.htmlElement.getAttribute('height'));
@@ -165,9 +173,9 @@ class Whiteboard {
       else {
         let intersection = {
           point: {
-            x: 0,
-            y: 0,
-            z: 0
+            x: 1,
+            y: 1,
+            z: 10
           }
         };
         this.shadowEl.setAttribute('position', intersection);
@@ -219,9 +227,15 @@ class Whiteboard {
           this.grid[i][j].setActive(data[i][j].active);
           //this.grid[i][j].setRotation(data[i][j].rotation);
           //this.grid[i][j].setIsTurnedOn(data[i][j].isturnedon);
+          this.grid[i][j].currentTo = data[i][j].currentTo;
+          this.grid[i][j].currentFrom = data[i][j].currentFrom;
         }
       }
     }
+
+    this.circuitValid = true;
+    this.#applyAnimations();
+    this.showHideError();
   }
 
 
@@ -239,9 +253,11 @@ class Whiteboard {
 
   sendGrid() {
     const newGrid = this.grid.map((row) => row.map((cell) => {
-      return { Letter: cell.gridLetter, Active: cell.active, Voltage:cell.volt, 
-               Resistance: cell.resistance, Rotation: cell.rotation, IsTurnedOn: cell.isturnedon,
-               currentFrom: cell.currentFrom, currentTo: cell.currentTo }
+      return {
+        Letter: cell.gridLetter, Active: cell.active, Voltage: cell.volt,
+        Resistance: cell.resistance, Rotation: cell.rotation, IsTurnedOn: cell.isturnedon,
+        currentFrom: cell.currentFrom, currentTo: cell.currentTo
+      }
     }));
 
     fetch('https://localhost:7268/simulate', {
@@ -251,13 +267,18 @@ class Whiteboard {
       },
       body: JSON.stringify(newGrid)
     })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then(this.#handleReceivedData.bind(this))
       .catch((error) => {
         console.error('Error:', error);
+        this.circuitValid = false;
+        this.showHideError();
       });
-
-      this.#applyAnimations();
   }
 
   handleCabluGraphics(row, col) {
@@ -280,7 +301,7 @@ class Whiteboard {
 
       // check alternate switch and transistor
       if ((this.grid[row - 1][col].gridLetter === 'S' || this.grid[row - 1][col].gridLetter === 't') &&
-         this.grid[row - 1][col].rotation != 180)
+        this.grid[row - 1][col].rotation != 180)
         hasUp = true;
     }
 
@@ -296,7 +317,7 @@ class Whiteboard {
         hasDown = true;
 
       // check alternate switch and transistor
-      if ((this.grid[row + 1][col].gridLetter === 'S' || this.grid[row + 1][col].gridLetter === 't') && 
+      if ((this.grid[row + 1][col].gridLetter === 'S' || this.grid[row + 1][col].gridLetter === 't') &&
         this.grid[row + 1][col].rotation != 0)
         hasDown = true;
     }
@@ -314,14 +335,14 @@ class Whiteboard {
 
       // check alternate switch and transistor
       if ((this.grid[row][col - 1].gridLetter === 'S' || this.grid[row][col - 1].gridLetter === 't') &&
-         this.grid[row][col - 1].rotation != 270)
+        this.grid[row][col - 1].rotation != 270)
         hasLeft = true;
     }
 
     // check rightwards
     if (col + 1 < this.cols && this.grid[row][col + 1].gridLetter != '0') {
       // check regular comps
-      if ((this.grid[row][col + 1].rotation != 0 && this.grid[row][col + 1].rotation != 180) 
+      if ((this.grid[row][col + 1].rotation != 0 && this.grid[row][col + 1].rotation != 180)
         && (this.grid[row][col + 1].gridLetter !== 'S' && this.grid[row][col + 1].gridLetter !== 't'))
         hasRight = true;
 
@@ -331,7 +352,7 @@ class Whiteboard {
 
       // check alternate switch and transistor
       if ((this.grid[row][col + 1].gridLetter === 'S' || this.grid[row][col + 1].gridLetter === 't') &&
-         this.grid[row][col + 1].rotation != 90)
+        this.grid[row][col + 1].rotation != 90)
         hasRight = true;
     }
 
@@ -371,16 +392,23 @@ class Whiteboard {
     for (let row = 0; row < this.rows; row++)
       for (let col = 0; col < this.cols; col++)
         if (this.grid[row][col].htmlElt)
-            this.grid[row][col].animateCurrent();
+          this.grid[row][col].animateCurrent();
   }
 
   resetAnimations() {
     for (let row = 0; row < this.rows; row++)
       for (let col = 0; col < this.cols; col++)
-        if (this.grid[row][col].htmlElt)
-          {
-            RemoveAllChildren(this.grid[row][col].htmlElt);
-            this.#evaluateCablus(row, col);
-          }
+        if (this.grid[row][col].htmlElt) {
+          RemoveAllChildren(this.grid[row][col].htmlElt);
+          this.#evaluateCablus(row, col);
+        }
+  }
+
+  showHideError() {
+    var paragraph = document.getElementById('errorCircuit');
+    if (this.circuitValid == true)
+      paragraph.style.display = 'none';
+    else
+      paragraph.style.display = 'block';
   }
 }

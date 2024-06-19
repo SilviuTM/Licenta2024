@@ -6,7 +6,7 @@ namespace Licenta.Controllers
     public class SimulationController : ControllerBase
     {
         [HttpPost("simulate")]
-        public CircuitElement[][] Simulate([FromBody] CircuitElement[][] mat)
+        public ActionResult<CircuitElement[][]> Simulate([FromBody] CircuitElement[][] mat)
         {
             var sim = new Simulator(mat);
 
@@ -24,10 +24,10 @@ namespace Licenta.Controllers
             sim.CleanUp();
 
             // Step 5: Return simulation
-            //if (sim.INVALID_CIRCUIT)
-            //    return "nu e corect broaie";
-            //else
-            return mat;
+            if (sim.INVALID_CIRCUIT)
+                return BadRequest();
+            else
+                return Ok(mat);
         }
     }
 }

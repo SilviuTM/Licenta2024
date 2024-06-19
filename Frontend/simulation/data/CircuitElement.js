@@ -74,7 +74,105 @@ class CircuitElement {
     }
 
     animateCurrent() {
-        
+        const pos = new Position(0, 0, 0.1);
+
+        // prima data curentul care vine inauntru
+        if (this.currentFrom.includes('N')) {
+            const html = document.createElement('a-entity');
+            html.setAttribute('gltf-model', '#curentMODEL');
+            html.setAttribute('classes', 'animation-mixer;');
+            html.setAttribute('animation-mixer', 'timeScale: -0.05;');
+            html.setAttribute('animation-mixer', 'clip: CurrentUp;');
+            html.setAttribute('animation-mixer', 'loop: repeat');
+            html.setAttribute('position', pos);
+            
+            this.htmlElt.appendChild(html);
+        }
+
+        if (this.currentFrom.includes('S')) {
+            const html = document.createElement('a-entity');
+            html.setAttribute('gltf-model', '#curentMODEL');
+            html.setAttribute('classes', 'animation-mixer;');
+            html.setAttribute('animation-mixer', 'timeScale: -0.05;');
+            html.setAttribute('animation-mixer', 'clip: CurrentDown;');
+            html.setAttribute('animation-mixer', 'loop: repeat');
+            html.setAttribute('position', pos);
+
+            this.htmlElt.appendChild(html);
+        }
+
+        if (this.currentFrom.includes('E')) {
+            const html = document.createElement('a-entity');
+            html.setAttribute('gltf-model', '#curentMODEL');
+            html.setAttribute('classes', 'animation-mixer;');
+            html.setAttribute('animation-mixer', 'timeScale: -0.05;');
+            html.setAttribute('animation-mixer', 'clip: CurrentLeft;');
+            html.setAttribute('animation-mixer', 'loop: repeat');
+            html.setAttribute('position', pos);
+
+            this.htmlElt.appendChild(html);
+        }
+
+        if (this.currentFrom.includes('W')) {
+            const html = document.createElement('a-entity');
+            html.setAttribute('gltf-model', '#curentMODEL');
+            html.setAttribute('classes', 'animation-mixer;');
+            html.setAttribute('animation-mixer', 'timeScale: -0.05;');
+            html.setAttribute('animation-mixer', 'clip: CurrentRight;');
+            html.setAttribute('animation-mixer', 'loop: repeat');
+            html.setAttribute('position', pos);
+
+            this.htmlElt.appendChild(html);
+        }
+
+        // apoi curentul care iese
+        if (this.currentTo.includes('N')) {
+            const html = document.createElement('a-entity');
+            html.setAttribute('gltf-model', '#curentMODEL');
+            html.setAttribute('classes', 'animation-mixer;');
+            html.setAttribute('animation-mixer', 'timeScale: 0.05;');
+            html.setAttribute('animation-mixer', 'clip: CurrentUp;');
+            html.setAttribute('animation-mixer', 'loop: repeat');
+            html.setAttribute('position', pos);
+
+            this.htmlElt.appendChild(html);
+        }
+
+        if (this.currentTo.includes('S')) {
+            const html = document.createElement('a-entity');
+            html.setAttribute('gltf-model', '#curentMODEL');
+            html.setAttribute('classes', 'animation-mixer;');
+            html.setAttribute('animation-mixer', 'timeScale: 0.05;');
+            html.setAttribute('animation-mixer', 'clip: CurrentDown;');
+            html.setAttribute('animation-mixer', 'loop: repeat');
+            html.setAttribute('position', pos);
+
+            this.htmlElt.appendChild(html);
+        }
+
+        if (this.currentTo.includes('E')) {
+            const html = document.createElement('a-entity');
+            html.setAttribute('gltf-model', '#curentMODEL');
+            html.setAttribute('classes', 'animation-mixer;');
+            html.setAttribute('animation-mixer', 'timeScale: 0.05;');
+            html.setAttribute('animation-mixer', 'clip: CurrentLeft;');
+            html.setAttribute('animation-mixer', 'loop: repeat');
+            html.setAttribute('position', pos);
+
+            this.htmlElt.appendChild(html);
+        }
+
+        if (this.currentTo.includes('W')) {
+            const html = document.createElement('a-entity');
+            html.setAttribute('gltf-model', '#curentMODEL');
+            html.setAttribute('classes', 'animation-mixer;');
+            html.setAttribute('animation-mixer', 'timeScale: 0.05;');
+            html.setAttribute('animation-mixer', 'clip: CurrentRight;');
+            html.setAttribute('animation-mixer', 'loop: repeat');
+            html.setAttribute('position', pos);
+
+            this.htmlElt.appendChild(html);
+        }
     }
 }
 
