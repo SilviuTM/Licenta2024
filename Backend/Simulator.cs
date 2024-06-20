@@ -4,15 +4,12 @@ namespace Licenta
 {
     public class Simulator
     {
-        // clean code important rule. if method longer than height of the screen is bad practice. WTF ARE YOU DOING HERE?????? Stephen King wants to collaborate with you for his books
         public void CheckIfCircuitValid(CircuitElement[][] circuit, char cameFrom, int row, int col, bool hasResistance)
         {
-            // CUR? EL?
             CircuitElement curEl = circuit[row][col];
             char curLet = curEl.Letter;
 
             // if we landed on nothing, stop this trail
-            // corect
             if (curLet == '0') return;
 
             // if we came from valid direction, keep going, otherwise stop
@@ -24,15 +21,13 @@ namespace Licenta
             // this applies for battery, if here and we have resistance, good. otherwise this circuit is invalid
             if (curLet == 'b')
             {
-                // not like us
                 if (!hasResistance)
                     INVALID_CIRCUIT = true;
 
                 return;
             }
-            // wdym not ok?
+
             bool ok = false;
-            // wdym lasa curul?
             if (curLet != 'c')
                 ok = true;
 
@@ -85,7 +80,6 @@ namespace Licenta
         /// 
 
         /// ASSUME ALL CURRENTS CLOCKWISE
-        /// SHAME ON YOU TO ASSUME THAT
 
         /// tranzistori poate. dupa prima simulare, se verifica tranzistorii si daca au destul voltaj, se reruleaza simularea cu ei deschisi
 
