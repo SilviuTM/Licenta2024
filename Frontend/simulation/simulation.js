@@ -1,5 +1,19 @@
 let debounce;
+var VRbec = 1;
+var VRbat = 1;
+var VRrez = 1;
 const whiteboard = new Whiteboard();  
+
+function ValuesInRange()
+{
+  if (VRbec < 1) VRbec = 1;
+  if (VRbat < 1) VRbat = 1;
+  if (VRrez < 1) VRrez = 1;
+
+  if (VRbec > 1000000) VRbec = 1000000;
+  if (VRbat > 1000000) VRbat = 1000000;
+  if (VRrez > 1000000) VRrez = 1000000;
+}
 
 document.querySelector('a-scene').addEventListener('contextmenu', function (evt) {
   evt.preventDefault();
@@ -25,38 +39,50 @@ AFRAME.registerComponent('force-z-above-0', {
 
 AFRAME.registerComponent('laser-intersection', {
   init: function () {
-    this.intersectedEl;
+    var intersectedEl;
 
     // Assuming we're in vr
     this.el.sceneEl.addEventListener('enter-vr', () => {
       whiteboard.inVR = true;
+
+      document.getElementById('camera').removeChild(document.getElementById('cursor'));
     });
 
     // And if we're not in VR
     this.el.sceneEl.addEventListener('exit-vr', () => {
       whiteboard.inVR = false;
+
+      const newHTML = document.createElement('a-cursor');
+      newHTML.setAttribute('id', 'cursor');
+      newHTML.setAttribute('raycaster', 'objects: .clickable, .deletable');
+      newHTML.setAttribute('color', '#FFDAE9');
+
+      document.getElementById('camera').appendChild(newHTML);
     });
 
     // take only first intersected object
     this.el.addEventListener('raycaster-intersection', (evt) => {
-        this.intersectedEl = evt.detail.els[0];
+        intersectedEl = evt.detail.els[0];
         console.log(intersectedEl);
     });
 
-    // this.el.addEventListener('raycaster-intersection-cleared', (evt) => {
-    //   console.log('Intersection cleared:', evt.detail.clearedEls);
-    //   evt.detail.clearedEls.forEach((el) => {
-    //     el.setAttribute('color', '#4CC3D9'); // Change color back to original
-    //     const index = this.intersectedEls.indexOf(el);
-    //     if (index > -1) {
-    //       this.intersectedEls.splice(index, 1);
-    //     }
-    //   });
-    // });
-
+    // interaction
     this.el.addEventListener('click', () => {
+      if (intersectedEl)
+        {
+          if (intersectedEl.id === 'whiteboard')
+            whiteboard.placeShape();
+          // other ifs here for menu
+
+          ValuesInRange();
+        }
     });
   },
+  
+  tick: function () {
+    if (whiteboard.inVR)
+      whiteboard.placeShadowShape();
+  }
 });
 
 document.getElementById('hand').setAttribute('laser-intersection', '');

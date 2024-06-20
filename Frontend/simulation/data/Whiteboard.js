@@ -54,7 +54,7 @@ class Whiteboard {
   #getIntersection() {
     if (this.inVR === false) {
       const cursorEl = document.querySelector('#cursor');
-      return cursorEl.components.raycaster.getIntersection(document.querySelector('.clickable'));
+      return cursorEl.components.raycaster.getIntersection(document.getElementById('whiteboard'));
     }
     else {
       const handEl = document.querySelector('#hand');

@@ -41,9 +41,6 @@
 
 
   <a-scene>
-      <!-- VR Stuff-->
-       <a-entity id="hand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
-
       <!-- Environment-->
       <a-assets>
         <img id="skybox" src="./img/clasa1500.png">
@@ -65,15 +62,26 @@
         <a-asset-item id="firStangaMODEL" src="./img/WireRight.glb"></a-asset-item>
         <a-asset-item id="firDreaptaMODEL" src="./img/WireLeft.glb"></a-asset-item>
         <a-asset-item id="curentMODEL" src="./img/curent.glb"></a-asset-item>
+
+        <img id="rosu" src="./img/rosu.png">
+        <img id="verde" src="./img/verde.png">
       </a-assets>
       <a-sky src="#skybox"></a-sky>
 
+      <!-- VR Stuff-->
+      <a-entity id="hand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
+
+      <a-entity id="VRMenu" position="-2.5 1.7 -0.7" rotation="0 60 0" width="1" height="1">
+        <a-entity class="clickable" id="VRnone" geometry="primitive: plane; width: 0.2; height: 0.2"
+                material="src: #rosu;" position="0 0 0"></a-entity>
+      </a-entity>
+
       <!-- Whiteboard -->
-      <a-box id="whiteboard" position="0 1.7 -1" rotation="0 0 0" width="5" height="1.75" depth="0.00000001" static-body class="clickable"></a-box>
-      <a-entity gltf-model="#blackboard" position="-0.17 1.7 -1" rotation="0 270 0"></a-entity>
+      <a-box id="whiteboard" position="0 1.7 -1.5" rotation="0 0 0" width="5" height="1.75" depth="0.00000001" static-body class="clickable"></a-box>
+      <a-entity gltf-model="#blackboard" position="-0.17 1.7 -1.5" rotation="0 270 0"></a-entity>
       
       <!-- Camera -->
-      <a-camera position="0 1.6 1" force-z-above-0>
+      <a-camera id="camera" position="0 1.6 1" force-z-above-0>
         <a-cursor id="cursor" raycaster="objects: .clickable, .deletable" color="#FFDAE9"></a-cursor>
       </a-camera>
       
