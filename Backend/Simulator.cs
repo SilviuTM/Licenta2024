@@ -1,10 +1,13 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+using System.Xml.Serialization;
 
 namespace Licenta
 {
     public class Simulator
     {
-        public void CheckIfCircuitValid(CircuitElement[][] circuit, char cameFrom, int row, int col, bool hasResistance)
+        public CircuitElement[][] circuit;
+
+        public void CheckIfCircuitValid(char cameFrom, int row, int col, bool hasResistance)
         {
             CircuitElement curEl = circuit[row][col];
             char curLet = curEl.Letter;
@@ -42,10 +45,10 @@ namespace Licenta
                 cameFroms[(row, col)].Count(x => x == 'W') > 1)
                 INVALID_CIRCUIT = true;
 
-            if (row > 0 && cameFrom != 'N') CheckIfCircuitValid(circuit, 'S', row - 1, col, hasResistance || ok);
-            if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') CheckIfCircuitValid(circuit, 'N', row + 1, col, hasResistance || ok);
-            if (col > 0 && cameFrom != 'W') CheckIfCircuitValid(circuit, 'E', row, col - 1, hasResistance || ok);
-            if (col < circuit[row].Length - 1 && cameFrom != 'E') CheckIfCircuitValid(circuit, 'W', row, col + 1, hasResistance || ok);
+            if (row > 0 && cameFrom != 'N') CheckIfCircuitValid('S', row - 1, col, hasResistance || ok);
+            if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') CheckIfCircuitValid('N', row + 1, col, hasResistance || ok);
+            if (col > 0 && cameFrom != 'W') CheckIfCircuitValid('E', row, col - 1, hasResistance || ok);
+            if (col < circuit[row].Length - 1 && cameFrom != 'E') CheckIfCircuitValid('W', row, col + 1, hasResistance || ok);
         }
 
         /// V = I * R
@@ -100,27 +103,23 @@ namespace Licenta
         List<Component> batteries;
         Dictionary<(int row, int col), Component> componentDict;
 
-        public Simulator(CircuitElement[][] circuit)
+        public Simulator(CircuitElement[][] circ)
         {
+            circuit = circ;
+
             cameFroms = new();
             intersections = new();
             INVALID_CIRCUIT = false;
 
             visited = new int[circuit.GetLength(0), circuit[0].Length];
+            intensitiesSet = new bool[circuit.GetLength(0), circuit[0].Length];
             nodes = [];
             batteries = [];
 
             componentDict = [];
         }
 
-        public void ResetCircuit(CircuitElement[][] circuit)
-        {
-            for (int row = 0; row < circuit.GetLength(0); row++)
-                for (int col = 0; col < circuit[row].Length; col++)
-                    circuit[row][col].Active = false;
-        }
-
-        public CircuitElement[][] Simulate(CircuitElement[][] circuit)
+        public CircuitElement[][] Simulate()
         {
             for (int row = 0; row < circuit.GetLength(0); row++)
                 for (int col = 0; col < circuit[row].Length; col++)
@@ -128,32 +127,32 @@ namespace Licenta
                     {
                         // check if valid
                         int rotation = circuit[row][col].Rotation / 90;
-                        circuit[row][col].Active = true;
+                        //circuit[row][col].Active = true;
 
-                        if (row > 0 && rotation == 0) TraverseGeneral(circuit, 'S', row - 1, col);
-                        if (row < circuit.GetLength(0) - 1 && rotation == 2) TraverseGeneral(circuit, 'N', row + 1, col);
-                        if (col > 0 && rotation == 1) TraverseGeneral(circuit, 'E', row, col - 1);
-                        if (col < circuit[row].Length - 1 && rotation == 3) TraverseGeneral(circuit, 'W', row, col + 1);
+                        if (row > 0 && rotation == 0) TraverseGeneral('S', row - 1, col);
+                        if (row < circuit.GetLength(0) - 1 && rotation == 2) TraverseGeneral('N', row + 1, col);
+                        if (col > 0 && rotation == 1) TraverseGeneral('E', row, col - 1);
+                        if (col < circuit[row].Length - 1 && rotation == 3) TraverseGeneral('W', row, col + 1);
 
                         // if valid then simulate
-                        TraverseFromBattery(circuit, row, col);
+                        TraverseFromBattery(row, col);
                     }
 
             return circuit;
         }
 
-        public void TraverseFromBattery(CircuitElement[][] circuit, int row, int col)
+        public void TraverseFromBattery(int row, int col)
         {
             int rotation = circuit[row][col].Rotation / 90;
-            circuit[row][col].Active = true;
+            //circuit[row][col].Active = true;
 
-            if (row > 0 && rotation == 0) TraverseGeneral(circuit, 'S', row - 1, col);
-            if (row < circuit.GetLength(0) - 1 && rotation == 2) TraverseGeneral(circuit, 'N', row + 1, col);
-            if (col > 0 && rotation == 1) TraverseGeneral(circuit, 'E', row, col - 1);
-            if (col < circuit[row].Length - 1 && rotation == 3) TraverseGeneral(circuit, 'W', row, col + 1);
+            if (row > 0 && rotation == 0) TraverseGeneral('S', row - 1, col);
+            if (row < circuit.GetLength(0) - 1 && rotation == 2) TraverseGeneral('N', row + 1, col);
+            if (col > 0 && rotation == 1) TraverseGeneral('E', row, col - 1);
+            if (col < circuit[row].Length - 1 && rotation == 3) TraverseGeneral('W', row, col + 1);
         }
 
-        public void TraverseGeneral(CircuitElement[][] circuit, char cameFrom, int row, int col)
+        public void TraverseGeneral(char cameFrom, int row, int col)
         {
             CircuitElement curEl = circuit[row][col];
             char curLet = curEl.Letter;
@@ -167,49 +166,49 @@ namespace Licenta
                 if (!CameFromValidDirection2T(cameFrom, curEl.Rotation / 90))
                     return;
 
-            if (curLet == 'l') HandleLightbulb(circuit, cameFrom, row, col);
+            if (curLet == 'l') HandleLightbulb(cameFrom, row, col);
 
             else if (curLet == 'b') return; // battery does nothing when you go in it again
 
-            else if (curLet == 's') HandleSwitch(circuit, cameFrom, row, col);
+            else if (curLet == 's') HandleSwitch(cameFrom, row, col);
 
             else if (curLet == 'c')
             {
-                circuit[row][col].Active = true;
+                //circuit[row][col].Active = true;
 
-                if (row > 0 && cameFrom != 'N') TraverseGeneral(circuit, 'S', row - 1, col);
-                if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') TraverseGeneral(circuit, 'N', row + 1, col);
-                if (col > 0 && cameFrom != 'W') TraverseGeneral(circuit, 'E', row, col - 1);
-                if (col < circuit[row].Length - 1 && cameFrom != 'E') TraverseGeneral(circuit, 'W', row, col + 1);
+                if (row > 0 && cameFrom != 'N') TraverseGeneral('S', row - 1, col);
+                if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') TraverseGeneral('N', row + 1, col);
+                if (col > 0 && cameFrom != 'W') TraverseGeneral('E', row, col - 1);
+                if (col < circuit[row].Length - 1 && cameFrom != 'E') TraverseGeneral('W', row, col + 1);
             }
 
             else throw new Exception("unsupported letter");
         }
 
-        public void HandleLightbulb(CircuitElement[][] circuit, char cameFrom, int row, int col)
+        public void HandleLightbulb(char cameFrom, int row, int col)
         {
             if (CameFromValidDirection2T(cameFrom, circuit[row][col].Rotation / 90) == false) return;
 
-            circuit[row][col].Active = true;
+            //circuit[row][col].Active = true;
 
-            if (cameFrom == 'N' && row < circuit.GetLength(0) - 1) TraverseGeneral(circuit, 'N', row + 1, col);
-            if (cameFrom == 'S' && row > 0) TraverseGeneral(circuit, 'S', row - 1, col);
-            if (cameFrom == 'W' && col < circuit[row].Length - 1) TraverseGeneral(circuit, 'W', row, col + 1);
-            if (cameFrom == 'E' && col > 0) TraverseGeneral(circuit, 'S', row, col - 1);
+            if (cameFrom == 'N' && row < circuit.GetLength(0) - 1) TraverseGeneral('N', row + 1, col);
+            if (cameFrom == 'S' && row > 0) TraverseGeneral('S', row - 1, col);
+            if (cameFrom == 'W' && col < circuit[row].Length - 1) TraverseGeneral('W', row, col + 1);
+            if (cameFrom == 'E' && col > 0) TraverseGeneral('S', row, col - 1);
         }
 
-        public void HandleSwitch(CircuitElement[][] circuit, char cameFrom, int row, int col)
+        public void HandleSwitch(char cameFrom, int row, int col)
         {
             if (CameFromValidDirection2T(cameFrom, circuit[row][col].Rotation / 90) == false) return;
 
             if (circuit[row][col].IsTurnedOn)
             {
-                circuit[row][col].Active = true;
+                //circuit[row][col].Active = true;
 
-                if (cameFrom == 'N' && row < circuit.GetLength(0) - 1) TraverseGeneral(circuit, 'N', row + 1, col);
-                if (cameFrom == 'S' && row > 0) TraverseGeneral(circuit, 'S', row - 1, col);
-                if (cameFrom == 'W' && col < circuit[row].Length - 1) TraverseGeneral(circuit, 'W', row, col + 1);
-                if (cameFrom == 'E' && col > 0) TraverseGeneral(circuit, 'S', row, col - 1);
+                if (cameFrom == 'N' && row < circuit.GetLength(0) - 1) TraverseGeneral('N', row + 1, col);
+                if (cameFrom == 'S' && row > 0) TraverseGeneral('S', row - 1, col);
+                if (cameFrom == 'W' && col < circuit[row].Length - 1) TraverseGeneral('W', row, col + 1);
+                if (cameFrom == 'E' && col > 0) TraverseGeneral('S', row, col - 1);
             }
             else return;
         }
@@ -226,12 +225,12 @@ namespace Licenta
         }
 
         // worse rewrites
-        public bool CheckValidDirection(CircuitElement[][] circuit, int row, int col)
+        public bool CheckValidDirection(int row, int col)
         {
             return false;
         }
 
-        public void ChooseTraverse(CircuitElement[][] circuit, char cameFrom, int row, int col)
+        public void ChooseTraverse(char cameFrom, int row, int col)
         {
             if (visited[row, col] == 1) return;
             visited[row, col] = 1;
@@ -239,20 +238,20 @@ namespace Licenta
             // wip
         }
 
-        public void TraverseFromWire(CircuitElement[][] circuit, char cameFrom, int row, int col)
+        public void TraverseFromWire(char cameFrom, int row, int col)
         {
-            if (row > 0 && cameFrom != 'N') TraverseGeneral(circuit, 'S', row - 1, col);
-            if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') TraverseGeneral(circuit, 'N', row + 1, col);
-            if (col > 0 && cameFrom != 'W') TraverseGeneral(circuit, 'E', row, col - 1);
-            if (col < circuit[row].Length - 1 && cameFrom != 'E') TraverseGeneral(circuit, 'W', row, col + 1);
+            if (row > 0 && cameFrom != 'N') TraverseGeneral('S', row - 1, col);
+            if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') TraverseGeneral('N', row + 1, col);
+            if (col > 0 && cameFrom != 'W') TraverseGeneral('E', row, col - 1);
+            if (col < circuit[row].Length - 1 && cameFrom != 'E') TraverseGeneral('W', row, col + 1);
         }
 
-        public void TraverseFrom2T(CircuitElement[][] circuit, char cameFrom, int row, int col)
+        public void TraverseFrom2T(char cameFrom, int row, int col)
         {
-            if (cameFrom == 'N' && row < circuit.GetLength(0) - 1) ChooseTraverse(circuit, 'N', row + 1, col);
-            if (cameFrom == 'S' && row > 0) ChooseTraverse(circuit, 'S', row - 1, col);
-            if (cameFrom == 'W' && col < circuit[row].Length - 1) ChooseTraverse(circuit, 'W', row, col + 1);
-            if (cameFrom == 'E' && col > 0) ChooseTraverse(circuit, 'S', row, col - 1);
+            if (cameFrom == 'N' && row < circuit.GetLength(0) - 1) ChooseTraverse('N', row + 1, col);
+            if (cameFrom == 'S' && row > 0) ChooseTraverse('S', row - 1, col);
+            if (cameFrom == 'W' && col < circuit[row].Length - 1) ChooseTraverse('W', row, col + 1);
+            if (cameFrom == 'E' && col > 0) ChooseTraverse('S', row, col - 1);
         }
 
 
@@ -260,7 +259,7 @@ namespace Licenta
         /// PILLAR 1: COMPUTE GRAPH 
 
         // Checks if coords are within the boundaries of the circuit
-        public bool WithinBounds(int row, int col, CircuitElement[][] circuit)
+        public bool WithinBounds(int row, int col)
         {
             if (row >= circuit.GetLength(0) - 1) return false;
             if (row < 0) return false;
@@ -325,36 +324,49 @@ namespace Licenta
             return false;
         }
 
+        // Get next from any
+        public List<(int row, int col, char from)> GetNextFromAny(int row, int col, char cameFrom)
+        {
+            if (circuit[row][col].Letter == 'c')
+                return GetNextFromWire(row, col, cameFrom);
+
+            if (circuit[row][col].Letter == 'S')
+                return [GetNextFromSwitchAlt(row, col, cameFrom)];
+
+            var aux = GetNextFrom2T(row, col, cameFrom);
+            return [(aux.row, aux.col, cameFrom)];
+        }
+
         // Get next from 2T
-        public (int row, int col) GetNextFrom2T(CircuitElement[][] circuit, int row, int col, char cameFrom)
+        public (int row, int col) GetNextFrom2T(int row, int col, char cameFrom)
         {
             int rotation = circuit[row][col].Rotation / 90;
 
             if (cameFrom == 'S')
                 if (rotation == 0 || rotation == 2)
-                    if (WithinBounds(row - 1, col, circuit))
+                    if (WithinBounds(row - 1, col))
                         return (row - 1, col);
 
             if (cameFrom == 'N')
                 if (rotation == 0 || rotation == 2)
-                    if (WithinBounds(row + 1, col, circuit))
+                    if (WithinBounds(row + 1, col))
                         return (row + 1, col);
 
             if (cameFrom == 'E')
                 if (rotation == 1 || rotation == 3)
-                    if (WithinBounds(row, col - 1, circuit))
+                    if (WithinBounds(row, col - 1))
                         return (row, col - 1);
 
             if (cameFrom == 'W')
                 if (rotation == 1 || rotation == 3)
-                    if (WithinBounds(row, col + 1, circuit))
+                    if (WithinBounds(row, col + 1))
                         return (row, col + 1);
 
             throw new Exception("man came outta nowhere");
         }
 
         // Get next from AltSwitch
-        public (int row, int col, char from) GetNextFromSwitchAlt(CircuitElement[][] circuit, int row, int col, char cameFrom)
+        public (int row, int col, char from) GetNextFromSwitchAlt(int row, int col, char cameFrom)
         {
             int rotation = circuit[row][col].Rotation / 90;
             bool turnOn = circuit[row][col].IsTurnedOn;
@@ -363,14 +375,14 @@ namespace Licenta
             {
                 if (rotation == 0)
                 {
-                    if (!turnOn && WithinBounds(row, col + 1, circuit))
+                    if (!turnOn && WithinBounds(row, col + 1))
                         return (row, col + 1, 'W');
-                    else if (turnOn && WithinBounds(row, col - 1, circuit))
+                    else if (turnOn && WithinBounds(row, col - 1))
                         return (row, col - 1, 'E');
                 }
-                else if (rotation == 1 && turnOn && WithinBounds(row, col + 1, circuit))
+                else if (rotation == 1 && turnOn && WithinBounds(row, col + 1))
                     return (row, col + 1, 'W');
-                else if (rotation == 3 && !turnOn && WithinBounds(row, col - 1, circuit))
+                else if (rotation == 3 && !turnOn && WithinBounds(row, col - 1))
                     return (row, col - 1, 'E');
             }
 
@@ -378,14 +390,14 @@ namespace Licenta
             {
                 if (rotation == 2)
                 {
-                    if (!turnOn && WithinBounds(row, col - 1, circuit))
+                    if (!turnOn && WithinBounds(row, col - 1))
                         return (row, col - 1, 'E');
-                    else if (turnOn && WithinBounds(row, col + 1, circuit))
+                    else if (turnOn && WithinBounds(row, col + 1))
                         return (row, col + 1, 'W');
                 }
-                else if (rotation == 3 && turnOn && WithinBounds(row, col - 1, circuit))
+                else if (rotation == 3 && turnOn && WithinBounds(row, col - 1))
                     return (row, col - 1, 'E');
-                else if (rotation == 1 && !turnOn && WithinBounds(row, col + 1, circuit))
+                else if (rotation == 1 && !turnOn && WithinBounds(row, col + 1))
                     return (row, col + 1, 'W');
             }
 
@@ -393,14 +405,14 @@ namespace Licenta
             {
                 if (rotation == 1)
                 {
-                    if (!turnOn && WithinBounds(row - 1, col, circuit))
+                    if (!turnOn && WithinBounds(row - 1, col))
                         return (row - 1, col, 'S');
-                    else if (turnOn && WithinBounds(row + 1, col, circuit))
+                    else if (turnOn && WithinBounds(row + 1, col))
                         return (row + 1, col, 'N');
                 }
-                else if (rotation == 2 && turnOn && WithinBounds(row - 1, col, circuit))
+                else if (rotation == 2 && turnOn && WithinBounds(row - 1, col))
                     return (row - 1, col, 'S');
-                else if (rotation == 0 && !turnOn && WithinBounds(row + 1, col, circuit))
+                else if (rotation == 0 && !turnOn && WithinBounds(row + 1, col))
                     return (row + 1, col, 'N');
             }
 
@@ -408,23 +420,35 @@ namespace Licenta
             {
                 if (rotation == 3)
                 {
-                    if (!turnOn && WithinBounds(row + 1, col, circuit))
+                    if (!turnOn && WithinBounds(row + 1, col))
                         return (row + 1, col, 'N');
-                    else if (turnOn && WithinBounds(row - 1, col, circuit))
+                    else if (turnOn && WithinBounds(row - 1, col))
                         return (row - 1, col, 'S');
                 }
-                else if (rotation == 0 && turnOn && WithinBounds(row + 1, col, circuit))
+                else if (rotation == 0 && turnOn && WithinBounds(row + 1, col))
                     return (row + 1, col, 'N');
-                else if (rotation == 2 && !turnOn && WithinBounds(row - 1, col, circuit))
+                else if (rotation == 2 && !turnOn && WithinBounds(row - 1, col))
                     return (row - 1, col, 'S');
             }
 
             throw new Exception("no really where did you come from");
         }
 
+        // Get next from wire
+        public List<(int row, int col, char from)> GetNextFromWire(int row, int col, char cameFrom)
+        {
+            List<(int row, int col, char from)> l = [];
+            if (cameFrom != 'N' && WithinBounds(row - 1, col)) l.Add((row - 1, col, 'S'));
+            if (cameFrom != 'S' && WithinBounds(row + 1, col)) l.Add((row + 1, col, 'N'));
+            if (cameFrom != 'E' && WithinBounds(row, col + 1)) l.Add((row, col + 1, 'W'));
+            if (cameFrom != 'W' && WithinBounds(row, col - 1)) l.Add((row, col - 1, 'E'));
+
+            return l;
+        }
+
         // Create nodes and branches
         // We will start from a battery, and work our way from there.
-        public void BeginNodeCompute(CircuitElement[][] circuit)
+        public void BeginNodeCompute()
         {
             for (int row = 0; row < circuit.GetLength(0); row++)
                 for (int col = 0; col < circuit[row].Length; col++)
@@ -444,11 +468,11 @@ namespace Licenta
                                         (rotate == 2 ? 'N' :
                                         (rotate == 3 ? 'W' : '0'))); 
 
-                        NodeCompute(circuit, node, row, col, tempFrom);
+                        NodeCompute(node, row, col, tempFrom);
                     }
         }
 
-        public void NodeCompute(CircuitElement[][] circuit, WireNode thisNode, int startRow, int startCol, char cameFrom)
+        public void NodeCompute(WireNode thisNode, int startRow, int startCol, char cameFrom)
         {
             // Now, we add the fresh new guy in our queue list
             // For each guy in q list, we see how many paths possible and what type they are
@@ -479,7 +503,7 @@ namespace Licenta
             startComp.end = startBranch;
 
             // Get start of branch
-            var aux = GetNextFrom2T(circuit, startRow, startCol, cameFrom);
+            var aux = GetNextFrom2T(startRow, startCol, cameFrom);
             newBranches.Add((startBranch, aux.row, aux.col, cameFrom));
 
             thisNode.ends.Add(startComp);
@@ -516,7 +540,7 @@ namespace Licenta
                     else if (circuit[thisRow][thisCol].Letter == 'S') // altswitch
                     {
                         branch.wires.Add(circuit[thisRow][thisCol]);
-                        (thisRow, thisCol, previousWasFrom) = GetNextFromSwitchAlt(circuit, thisRow, thisCol, previousWasFrom);
+                        (thisRow, thisCol, previousWasFrom) = GetNextFromSwitchAlt(thisRow, thisCol, previousWasFrom);
                     }
 
                     else if (circuit[thisRow][thisCol].Letter == 's') // switch
@@ -525,13 +549,13 @@ namespace Licenta
                             break;
 
                         branch.wires.Add(circuit[thisRow][thisCol]);
-                        (thisRow, thisCol) = GetNextFrom2T(circuit, thisRow, thisCol, previousWasFrom);
+                        (thisRow, thisCol) = GetNextFrom2T(thisRow, thisCol, previousWasFrom);
                     }
 
                     else if (circuit[thisRow][thisCol].Letter == 'a') // ammeter (treat as wire)
                     {
                         branch.wires.Add(circuit[thisRow][thisCol]);
-                        (thisRow, thisCol) = GetNextFrom2T(circuit, thisRow, thisCol, previousWasFrom);
+                        (thisRow, thisCol) = GetNextFrom2T(thisRow, thisCol, previousWasFrom);
                     }
 
                     else if (circuit[thisRow][thisCol].Letter == 'c') // wire
@@ -543,7 +567,7 @@ namespace Licenta
                         List<(int row, int col, char from)> paths = [];
 
                         foreach (var d in deltas)
-                            if (previousWasFrom != d.fromForbidden && WithinBounds(thisRow + d.r, thisCol + d.c, circuit))
+                            if (previousWasFrom != d.fromForbidden && WithinBounds(thisRow + d.r, thisCol + d.c))
                             {
                                 if (CheckIfCanAny(circuit[thisRow + d.r][thisCol + d.c], d.fromProper))
                                     paths.Add((thisRow + d.r, thisCol + d.c, d.fromProper));
@@ -613,7 +637,7 @@ namespace Licenta
                     WireNode node = new WireNode();
                     nodes.Add(node);
 
-                    NodeCompute(circuit, node, newNode.row, newNode.col, newNode.cFrom);
+                    NodeCompute(node, newNode.row, newNode.col, newNode.cFrom);
                 }
 
                 potentialNewNode.RemoveAt(0);
@@ -777,9 +801,10 @@ namespace Licenta
         /// PILLAR 4: KIRCHOFF'S CURRENT LAW (AND CLEANUP)
 
         Dictionary<(int row, int col), List<char>> goTos = [];
-        List<(int row, int col)> moveCrds = [];
+        List<(int row, int col, double prevAmp)> moveCrds = [];
+        bool[,] intensitiesSet;
 
-        public void KCL(CircuitElement[][] circuit)
+        public void KCL()
         {
             // First compute goTos for the entire circuit
             for (int i = 0; i < circuit.GetLength(0); i++)
@@ -792,19 +817,19 @@ namespace Licenta
                         if (circuit[i][j].Letter == 'b')
                         {
                             // from N to S
-                            if (circuit[i][j].Rotation == 180 && WithinBounds(i + 1, j, circuit) && CheckIfCanAny(circuit[i + 1][j], 'N'))
+                            if (circuit[i][j].Rotation == 180 && WithinBounds(i + 1, j) && CheckIfCanAny(circuit[i + 1][j], 'N'))
                                 goTos[(i, j)].Add('S');
 
                             // from S to N
-                            if (circuit[i][j].Rotation == 0 && WithinBounds(i - 1, j, circuit) && CheckIfCanAny(circuit[i - 1][j], 'S'))
+                            if (circuit[i][j].Rotation == 0 && WithinBounds(i - 1, j) && CheckIfCanAny(circuit[i - 1][j], 'S'))
                                 goTos[(i, j)].Add('N');
 
                             // from E to W
-                            if (circuit[i][j].Rotation == 90 && WithinBounds(i, j - 1, circuit) && CheckIfCanAny(circuit[i][j - 1], 'E'))
+                            if (circuit[i][j].Rotation == 90 && WithinBounds(i, j - 1) && CheckIfCanAny(circuit[i][j - 1], 'E'))
                                 goTos[(i, j)].Add('W');
 
                             // from W to E
-                            if (circuit[i][j].Rotation == 270 && WithinBounds(i, j + 1, circuit) && CheckIfCanAny(circuit[i][j + 1], 'W'))
+                            if (circuit[i][j].Rotation == 270 && WithinBounds(i, j + 1) && CheckIfCanAny(circuit[i][j + 1], 'W'))
                                 goTos[(i, j)].Add('E');
                         }
 
@@ -816,9 +841,9 @@ namespace Licenta
 
                             if (rotation == 0)
                             {
-                                if (!turnOn && WithinBounds(i, j + 1, circuit) && CheckIfCanAny(circuit[i][j + 1], 'W'))
+                                if (!turnOn && WithinBounds(i, j + 1) && CheckIfCanAny(circuit[i][j + 1], 'W'))
                                     goTos[(i, j)].Add('E');
-                                else if (turnOn && WithinBounds(i, j - 1, circuit) && CheckIfCanAny(circuit[i][j - 1], 'E'))
+                                else if (turnOn && WithinBounds(i, j - 1) && CheckIfCanAny(circuit[i][j - 1], 'E'))
                                     goTos[(i, j)].Add('W');
 
                                 goTos[(i, j)].Add('S');
@@ -826,9 +851,9 @@ namespace Licenta
 
                             if (rotation == 2)
                             {
-                                if (!turnOn && WithinBounds(i, j - 1, circuit) && CheckIfCanAny(circuit[i][j - 1], 'E'))
+                                if (!turnOn && WithinBounds(i, j - 1) && CheckIfCanAny(circuit[i][j - 1], 'E'))
                                     goTos[(i, j)].Add('W');
-                                else if (turnOn && WithinBounds(i, j + 1, circuit) && CheckIfCanAny(circuit[i][j + 1], 'W'))
+                                else if (turnOn && WithinBounds(i, j + 1) && CheckIfCanAny(circuit[i][j + 1], 'W'))
                                     goTos[(i, j)].Add('E');
 
                                 goTos[(i, j)].Add('N');
@@ -836,9 +861,9 @@ namespace Licenta
 
                             if (rotation == 1)
                             {
-                                if (!turnOn && WithinBounds(i - 1, j, circuit) && CheckIfCanAny(circuit[i - 1][j], 'S'))
+                                if (!turnOn && WithinBounds(i - 1, j) && CheckIfCanAny(circuit[i - 1][j], 'S'))
                                     goTos[(i, j)].Add('N');
-                                else if (turnOn && WithinBounds(i + 1, j, circuit) && CheckIfCanAny(circuit[i + 1][j], 'N'))
+                                else if (turnOn && WithinBounds(i + 1, j) && CheckIfCanAny(circuit[i + 1][j], 'N'))
                                     goTos[(i, j)].Add('S');
 
                                 goTos[(i, j)].Add('E');
@@ -846,9 +871,9 @@ namespace Licenta
 
                             if (rotation == 3)
                             {
-                                if (!turnOn && WithinBounds(i + 1, j, circuit) && CheckIfCanAny(circuit[i + 1][j], 'N'))
+                                if (!turnOn && WithinBounds(i + 1, j) && CheckIfCanAny(circuit[i + 1][j], 'N'))
                                     goTos[(i, j)].Add('S');
-                                else if (turnOn && WithinBounds(i - 1, j, circuit) && CheckIfCanAny(circuit[i - 1][j], 'S'))
+                                else if (turnOn && WithinBounds(i - 1, j) && CheckIfCanAny(circuit[i - 1][j], 'S'))
                                     goTos[(i, j)].Add('N');
 
                                 goTos[(i, j)].Add('W');
@@ -859,19 +884,19 @@ namespace Licenta
                         else if (circuit[i][j].Letter == 'c')
                         {
                             // from N to S
-                            if (WithinBounds(i + 1, j, circuit) && CheckIfCanAny(circuit[i + 1][j], 'N'))
+                            if (WithinBounds(i + 1, j) && CheckIfCanAny(circuit[i + 1][j], 'N'))
                                 goTos[(i, j)].Add('S');
 
                             // from S to N
-                            if (WithinBounds(i - 1, j, circuit) && CheckIfCanAny(circuit[i - 1][j], 'S'))
+                            if (WithinBounds(i - 1, j) && CheckIfCanAny(circuit[i - 1][j], 'S'))
                                 goTos[(i, j)].Add('N');
 
                             // from E to W
-                            if (WithinBounds(i, j - 1, circuit) && CheckIfCanAny(circuit[i][j - 1], 'E'))
+                            if (WithinBounds(i, j - 1) && CheckIfCanAny(circuit[i][j - 1], 'E'))
                                 goTos[(i, j)].Add('W');
 
                             // from W to E
-                            if (WithinBounds(i, j + 1, circuit) && CheckIfCanAny(circuit[i][j + 1], 'W'))
+                            if (WithinBounds(i, j + 1) && CheckIfCanAny(circuit[i][j + 1], 'W'))
                                 goTos[(i, j)].Add('E');
                         }
 
@@ -885,22 +910,22 @@ namespace Licenta
                             if (circuit[i][j].Rotation == 0 || circuit[i][j].Rotation == 180)
                             {
                                 // from N to S
-                                if (WithinBounds(i + 1, j, circuit) && CheckIfCanAny(circuit[i + 1][j], 'N'))
+                                if (WithinBounds(i + 1, j) && CheckIfCanAny(circuit[i + 1][j], 'N'))
                                     goTos[(i, j)].Add('S');
 
                                 // from S to N
-                                if (WithinBounds(i - 1, j, circuit) && CheckIfCanAny(circuit[i - 1][j], 'S'))
+                                if (WithinBounds(i - 1, j) && CheckIfCanAny(circuit[i - 1][j], 'S'))
                                     goTos[(i, j)].Add('N');
                             }
 
                             if (circuit[i][j].Rotation == 90 || circuit[i][j].Rotation == 270)
                             {
                                 // from E to W
-                                if (WithinBounds(i, j - 1, circuit) && CheckIfCanAny(circuit[i][j - 1], 'E'))
+                                if (WithinBounds(i, j - 1) && CheckIfCanAny(circuit[i][j - 1], 'E'))
                                     goTos[(i, j)].Add('W');
 
                                 // from W to E
-                                if (WithinBounds(i, j + 1, circuit) && CheckIfCanAny(circuit[i][j + 1], 'W'))
+                                if (WithinBounds(i, j + 1) && CheckIfCanAny(circuit[i][j + 1], 'W'))
                                     goTos[(i, j)].Add('E');
                             }
                         }
@@ -908,7 +933,7 @@ namespace Licenta
 
                         // Then compute moveCrds based on positive intensity batteries
                         if (circuit[i][j].Letter == 'b' && circuit[i][j].Amplitude > 0)
-                            moveCrds.Add((i, j));
+                            moveCrds.Add((i, j, 0));
                     }
 
             // Then traverse while marking currentFroms and currentTos and deleting goTos from the desination (if i go S then next guy will have N removed as we came from there)
@@ -917,29 +942,33 @@ namespace Licenta
                 // Check if all coords have 2+ goTos
                 bool all2Plus = true;
                 foreach (var m in moveCrds)
-                    if (goTos[m].Count < 2) all2Plus = false;
+                    if (goTos[(m.row, m.col)].Count < 2) all2Plus = false;
 
                 if (all2Plus)
                 {
                     //If they do, take coord[0], go all its ways and split it for all of them, proceed
-                    while (goTos[moveCrds[0]].Count > 0)
-                        moveCrds.Add(KCLMoveDeletion(0, goTos[moveCrds[0]][0], circuit));
+                    while (goTos[(moveCrds[0].row, moveCrds[0].col)].Count > 0)
+                    {
+                        var nxt = KCLMoveDeletion(0, goTos[(moveCrds[0].row, moveCrds[0].col)][0]);
+                        moveCrds.Add((nxt.row, nxt.col, circuit[moveCrds[0].row][moveCrds[0].col].Amplitude));
+                    }
                 }
 
                 for (int i = 0; i < moveCrds.Count; i++)
                 {
                     // If we end up somewhere with 1 goTo, proceed until we no longer can
-                    while (goTos[moveCrds[i]].Count == 1)
+                    while (goTos[(moveCrds[i].row, moveCrds[i].col)].Count == 1)
                     {
                         // Manage current component
                         KCLDoMove(i);
 
                         // Now that that's done, we can eliminate the current spot and proceed
-                        moveCrds[i] = KCLMoveDeletion(i, goTos[moveCrds[i]][0], circuit);
+                        var nxt = KCLMoveDeletion(i, goTos[(moveCrds[i].row, moveCrds[i].col)][0]);
+                        moveCrds[i] = (nxt.row, nxt.col, circuit[moveCrds[i].row][moveCrds[i].col].Amplitude);
                     }
 
                     // If we end up somewhere with 0 goTos, delete
-                    if (goTos[moveCrds[i]].Count == 0)
+                    if (goTos[(moveCrds[i].row, moveCrds[i].col)].Count == 0)
                     {
                         moveCrds.RemoveAt(i);
                         i--;
@@ -947,7 +976,7 @@ namespace Licenta
                     }
 
                     // If we end up somewhere with 2+ goTos, skip. If all have 2+, the earlier check will make sure they no longer do
-                    if (goTos[moveCrds[i]].Count > 1)
+                    if (goTos[(moveCrds[i].row, moveCrds[i].col)].Count > 1)
                         continue;
                 }
             }
@@ -955,36 +984,42 @@ namespace Licenta
 
         void KCLDoMove(int moveID)
         {
-            if (componentDict.ContainsKey(moveCrds[moveID]))
+            // add prev amp here (if wrong, it gets changed later)
+            if (intensitiesSet[moveCrds[moveID].row, moveCrds[moveID].col] == false)
+                circuit[moveCrds[moveID].row][moveCrds[moveID].col].Amplitude += moveCrds[moveID].prevAmp;
+
+            if (componentDict.ContainsKey((moveCrds[moveID].row, moveCrds[moveID].col)))
             {
-                Component comp = componentDict[moveCrds[moveID]];
+                Component comp = componentDict[(moveCrds[moveID].row, moveCrds[moveID].col)];
 
                 // When we end up on a light or resistor, calculate its intensity using ohms law and set its neighbouring branches as that
                 if (comp.element.Letter == 'l' || comp.element.Letter == 'r')
                 {
-                    double voltage = comp.end.voltage - comp.begin.voltage;
+                    double voltage = comp.end.parentNode.voltage - comp.begin.parentNode.voltage;
                     if (voltage < 0) voltage *= -1;
                     double intensity = voltage / comp.element.Resistance;
 
+                    intensitiesSet[moveCrds[moveID].row, moveCrds[moveID].col] = true;
                     comp.element.Amplitude = intensity;
 
                     comp.begin.intensity = intensity;
-                    comp.begin.SetAllIntensities();
+                    comp.begin.SetAllIntensities(circuit, intensitiesSet);
 
                     comp.end.intensity = intensity;
-                    comp.end.SetAllIntensities();
+                    comp.end.SetAllIntensities(circuit, intensitiesSet);
                 }
 
                 // When we end up on a battery, set its neighbouring branches as its intensity
                 if (comp.element.Letter == 'b')
                 {
                     double intensity = comp.element.Amplitude;
+                    intensitiesSet[moveCrds[moveID].row, moveCrds[moveID].col] = true;
 
                     comp.begin.intensity = intensity;
-                    comp.begin.SetAllIntensities();
+                    comp.begin.SetAllIntensities(circuit, intensitiesSet);
 
                     comp.end.intensity = intensity;
-                    comp.end.SetAllIntensities();
+                    comp.end.SetAllIntensities(circuit, intensitiesSet);
                 }
 
                 // When we end up on an ammeter, it was treated earlier as wire, so don't do anything
@@ -995,12 +1030,16 @@ namespace Licenta
                 // When we end up on a voltmeter, set its voltage based on the difference of begin.voltage - end.voltage
                 if (comp.element.Letter == 'v')
                 {
-                    comp.element.Voltage = comp.begin.voltage - comp.end.voltage;
+                    intensitiesSet[moveCrds[moveID].row, moveCrds[moveID].col] = true;
+                    comp.element.Amplitude = 0;
+                    comp.element.Voltage = comp.begin.parentNode.voltage - comp.end.parentNode.voltage;
+                    comp.begin.SetToZero(circuit, intensitiesSet);
+                    comp.end.SetToZero(circuit, intensitiesSet);
                 }
             }
         }
 
-        (int row, int col) KCLMoveDeletion(int moveID, char goWas, CircuitElement[][] circuit)
+        (int row, int col) KCLMoveDeletion(int moveID, char goWas)
         {
             // Deletes current move from goTos
             int iDelta = 0, jDelta = 0;
@@ -1011,7 +1050,7 @@ namespace Licenta
             if (goWas == 'W') jDelta = -1;
 
             (int row, int col) newMove = (moveCrds[moveID].row + iDelta, moveCrds[moveID].col + jDelta);
-            goTos[moveCrds[moveID]].Remove(goWas);
+            goTos[(moveCrds[moveID].row, moveCrds[moveID].col)].Remove(goWas);
 
             char goTo = goWas == 'S' ? 'N' :
                        (goWas == 'N' ? 'S' :
@@ -1036,73 +1075,80 @@ namespace Licenta
             // if they have no end (that has resistance) then they're useless remove them and set their amplitude to 0
             // then repeat checking
         }
+
+        public class Atom { }
+
+        public class WireBranch : Atom
+        {
+            public WireNode? parentNode;
+
+            public Atom begin;
+            public List<CircuitElement> wires;
+            public List<Atom> end;
+
+            public double voltage = 0, intensity = 0;
+
+            public WireBranch(Atom start, WireNode wireDad)
+            {
+                begin = start;
+                wires = [];
+                end = [];
+                parentNode = wireDad;
+            }
+
+            public void SetAllIntensities(CircuitElement[][] circuit, bool[,] intensities)
+            {
+                foreach (var c in wires)
+                {
+                    c.Amplitude = (int)(intensity * 100) / 100.0;
+                    for (int row = 0; row < circuit.GetLength(0); row++)
+                        for (int col = 0; col < circuit[row].Length; col++)
+                            if (c == circuit[row][col])
+                                intensities[row, col] = true;
+                }
+            }
+
+            public void SetToZero(CircuitElement[][] circuit, bool[,] intensities)
+            {
+                intensity = 0;
+                SetAllIntensities(circuit, intensities);
+            }
+        }
+
+        public class Component : Atom
+        {
+            public WireBranch? begin;
+            public CircuitElement element;
+            public WireBranch? end;
+
+            // when this is true, positive is on end node, and negative is on begin node
+            // otherwise, reverse
+            public bool batteryCurrentCameFromGoodSide;
+
+            public Component(CircuitElement persona)
+            {
+                element = persona;
+            }
+        }
+
+        public class WireNode
+        {
+            public List<Component> ends;
+            public List<WireBranch> ownBranches;
+            public double voltage;
+
+            public WireNode()
+            {
+                ends = [];
+                ownBranches = [];
+            }
+
+            public void SetAllVolts()
+            {
+                foreach (var wb in ownBranches)
+                    wb.voltage = voltage;
+            }
+        }
     }
 
-    public class Atom { }
-
-    public class WireBranch : Atom
-    {
-        public WireNode? parentNode;
-
-        public Atom begin;
-        public List<CircuitElement> wires;
-        public List<Atom> end;
-
-        public double voltage = 0, intensity = 0;
-
-        public WireBranch(Atom start, WireNode wireDad)
-        {
-            begin = start;
-            wires = [];
-            end = [];
-            parentNode = wireDad;
-        }
-
-        public void SetAllIntensities()
-        {
-            foreach (var c in wires)
-                c.Amplitude = intensity;
-        }
-
-        public void SetToZero()
-        {
-            intensity = 0;
-            SetAllIntensities();
-        }
-    }
-
-    public class Component : Atom
-    {
-        public WireBranch? begin;
-        public CircuitElement element;
-        public WireBranch? end;
-
-        // when this is true, positive is on end node, and negative is on begin node
-        // otherwise, reverse
-        public bool batteryCurrentCameFromGoodSide;
-
-        public Component(CircuitElement persona)
-        {
-            element = persona;
-        }
-    }
-
-    public class WireNode
-    {
-        public List<Component> ends;
-        public List<WireBranch> ownBranches;
-        public double voltage;
-
-        public WireNode()
-        {
-            ends = [];
-            ownBranches = [];
-        }
-
-        public void SetAllVolts()
-        {
-            foreach (var wb in ownBranches)
-                wb.voltage = voltage;
-        }
-    }
 }

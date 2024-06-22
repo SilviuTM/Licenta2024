@@ -4,8 +4,6 @@
     {
         public char Letter {get;set;}
 
-        public bool Active { get; set; }
-
         public double Voltage { get; set; }
 
         public double Amplitude { get; set; }

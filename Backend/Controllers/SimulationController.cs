@@ -11,7 +11,7 @@ namespace Licenta.Controllers
             var sim = new Simulator(mat);
 
             // Step 1: Compute
-            sim.BeginNodeCompute(mat);
+            sim.BeginNodeCompute();
 
             // Step 2: Verify
             sim.VerifySourceLoop();
@@ -20,8 +20,7 @@ namespace Licenta.Controllers
             sim.ModifiedNodalAnalysis();
 
             // Step 4: Calculate Intensities
-            sim.KCL(mat);
-            sim.CleanUp();
+            sim.KCL();
 
             // Step 5: Return simulation
             if (sim.INVALID_CIRCUIT)
