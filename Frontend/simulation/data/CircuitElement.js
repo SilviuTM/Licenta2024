@@ -61,6 +61,10 @@ class CircuitElement {
 
     }
 
+    afisateText() {
+
+    }
+
     buildHtmlElement() {
         const html = document.createElement('a-box');
         html.setAttribute('width', this.width);
@@ -74,53 +78,55 @@ class CircuitElement {
     }
 
     animateCurrent() {
-        const pos = new Position(0, 0, 0.1);
+        let array = ['N', 'E', 'S', 'W'];
+
+        for (let i = 0; i < this.currentFrom.length; i++)
+            this.currentFrom[i] = array[(array.findIndex(x => x == this.currentFrom[i]) + this.rotation / 90) % 4];
+
+        for (let i = 0; i < this.currentTo.length; i++)
+            this.currentTo[i] = array[(array.findIndex(x => x == this.currentTo[i]) + this.rotation / 90) % 4];
+
+        let destination = 0.87;
+        //if (this.intensity == 0) destination = 0;
+        //if (this.intensity < 0) destination *= -1;
 
         // prima data curentul care vine inauntru
         if (this.currentFrom.includes('N')) {
             const html = document.createElement('a-entity');
+            html.setAttribute('scale', '1.75 1.75 1.75');
+            html.setAttribute('rotation', `0 0 ${360 - this.rotation}`);
             html.setAttribute('gltf-model', '#curentMODEL');
-            html.setAttribute('classes', 'animation-mixer;');
-            html.setAttribute('animation-mixer', 'timeScale: -0.05;');
-            html.setAttribute('animation-mixer', 'clip: CurrentUp;');
-            html.setAttribute('animation-mixer', 'loop: repeat');
-            html.setAttribute('position', pos);
+            html.setAttribute('animation', {property: 'position', easing: 'linear', dur: 2000, to: '0 0 0', from: `0 ${destination} 0`, loop: true});
             
             this.htmlElt.appendChild(html);
         }
 
         if (this.currentFrom.includes('S')) {
             const html = document.createElement('a-entity');
+            html.setAttribute('scale', '1.75 1.75 1.75');
+            html.setAttribute('rotation', `0 0 ${360 - this.rotation}`);
             html.setAttribute('gltf-model', '#curentMODEL');
-            html.setAttribute('classes', 'animation-mixer;');
-            html.setAttribute('animation-mixer', 'timeScale: -0.05;');
-            html.setAttribute('animation-mixer', 'clip: CurrentDown;');
-            html.setAttribute('animation-mixer', 'loop: repeat');
-            html.setAttribute('position', pos);
+            html.setAttribute('animation', {property: 'position', easing: 'linear', dur: 2000, to: '0 0 0', from: `0 -${destination} 0`, loop: true});
 
             this.htmlElt.appendChild(html);
         }
 
         if (this.currentFrom.includes('E')) {
             const html = document.createElement('a-entity');
+            html.setAttribute('scale', '1.75 1.75 1.75');
+            html.setAttribute('rotation', `0 0 ${360 - this.rotation}`);
             html.setAttribute('gltf-model', '#curentMODEL');
-            html.setAttribute('classes', 'animation-mixer;');
-            html.setAttribute('animation-mixer', 'timeScale: -0.05;');
-            html.setAttribute('animation-mixer', 'clip: CurrentLeft;');
-            html.setAttribute('animation-mixer', 'loop: repeat');
-            html.setAttribute('position', pos);
+            html.setAttribute('animation', {property: 'position', easing: 'linear', dur: 2000, to: '0 0 0', from: `${destination} 0 0`, loop: true});
 
             this.htmlElt.appendChild(html);
         }
 
         if (this.currentFrom.includes('W')) {
             const html = document.createElement('a-entity');
+            html.setAttribute('scale', '1.75 1.75 1.75');
+            html.setAttribute('rotation', `0 0 ${360 - this.rotation}`);
             html.setAttribute('gltf-model', '#curentMODEL');
-            html.setAttribute('classes', 'animation-mixer;');
-            html.setAttribute('animation-mixer', 'timeScale: -0.05;');
-            html.setAttribute('animation-mixer', 'clip: CurrentRight;');
-            html.setAttribute('animation-mixer', 'loop: repeat');
-            html.setAttribute('position', pos);
+            html.setAttribute('animation', {property: 'position', easing: 'linear', dur: 2000, to: '0 0 0', from: `-${destination} 0 0`, loop: true});
 
             this.htmlElt.appendChild(html);
         }
@@ -128,48 +134,40 @@ class CircuitElement {
         // apoi curentul care iese
         if (this.currentTo.includes('N')) {
             const html = document.createElement('a-entity');
+            html.setAttribute('scale', '1.75 1.75 1.75');
+            html.setAttribute('rotation', `0 0 ${360 - this.rotation}`);
             html.setAttribute('gltf-model', '#curentMODEL');
-            html.setAttribute('classes', 'animation-mixer;');
-            html.setAttribute('animation-mixer', 'timeScale: 0.05;');
-            html.setAttribute('animation-mixer', 'clip: CurrentUp;');
-            html.setAttribute('animation-mixer', 'loop: repeat');
-            html.setAttribute('position', pos);
+            html.setAttribute('animation', {property: 'position', easing: 'linear', dur: 2000, from: '0 0 0', to: `0 ${destination} 0`, loop: true});
 
             this.htmlElt.appendChild(html);
         }
 
         if (this.currentTo.includes('S')) {
             const html = document.createElement('a-entity');
+            html.setAttribute('scale', '1.75 1.75 1.75');
+            html.setAttribute('rotation', `0 0 ${360 - this.rotation}`);
             html.setAttribute('gltf-model', '#curentMODEL');
-            html.setAttribute('classes', 'animation-mixer;');
-            html.setAttribute('animation-mixer', 'timeScale: 0.05;');
-            html.setAttribute('animation-mixer', 'clip: CurrentDown;');
-            html.setAttribute('animation-mixer', 'loop: repeat');
-            html.setAttribute('position', pos);
+            html.setAttribute('animation', {property: 'position', easing: 'linear', dur: 2000, from: '0 0 0', to: `0 -${destination} 0`, loop: true});
 
             this.htmlElt.appendChild(html);
         }
 
         if (this.currentTo.includes('E')) {
             const html = document.createElement('a-entity');
+            html.setAttribute('scale', '1.75 1.75 1.75');
+            html.setAttribute('rotation', `0 0 ${360 - this.rotation}`);
             html.setAttribute('gltf-model', '#curentMODEL');
-            html.setAttribute('classes', 'animation-mixer;');
-            html.setAttribute('animation-mixer', 'timeScale: 0.05;');
-            html.setAttribute('animation-mixer', 'clip: CurrentLeft;');
-            html.setAttribute('animation-mixer', 'loop: repeat');
-            html.setAttribute('position', pos);
+            html.setAttribute('animation', {property: 'position', easing: 'linear', dur: 2000, from: '0 0 0', to: `${destination} 0 0`, loop: true});
 
             this.htmlElt.appendChild(html);
         }
 
         if (this.currentTo.includes('W')) {
             const html = document.createElement('a-entity');
+            html.setAttribute('scale', '1.75 1.75 1.75');
+            html.setAttribute('rotation', `0 0 ${360 - this.rotation}`);
             html.setAttribute('gltf-model', '#curentMODEL');
-            html.setAttribute('classes', 'animation-mixer;');
-            html.setAttribute('animation-mixer', 'timeScale: 0.05;');
-            html.setAttribute('animation-mixer', 'clip: CurrentRight;');
-            html.setAttribute('animation-mixer', 'loop: repeat');
-            html.setAttribute('position', pos);
+            html.setAttribute('animation', {property: 'position', easing: 'linear', dur: 2000, from: '0 0 0', to: `-${destination} 0 0`, loop: true});
 
             this.htmlElt.appendChild(html);
         }
@@ -193,6 +191,8 @@ class Bec extends CircuitElement {
             this.resistance = 1;
         else
             this.resistance = +rezistenta.value;
+
+            this.afisateText();
     }
 
     getHtmlElement() {
@@ -208,6 +208,17 @@ class Bec extends CircuitElement {
         html.setAttribute('class', this.classes);
         html.setAttribute(this.bodyType, '');
         return html;
+    }
+
+    afisateText() {
+        const html = document.createElement('a-text');
+        html.setAttribute('value', `${this.resistance}oh`);
+        html.setAttribute('position', `0.5 -0.5 0.3`);
+        html.setAttribute('scale', `1.5 1.5 1.5`);
+        html.setAttribute('align', `center`);
+        html.setAttribute('color', `#FFF`);
+
+        this.htmlElt.appendChild(html);
     }
 }
 
@@ -225,6 +236,8 @@ class Baterie extends CircuitElement {
             this.volt = 1;
         else
             this.volt = +voltaj.value;
+
+        this.afisateText()
     }
 
     getHtmlElement() {
@@ -240,6 +253,17 @@ class Baterie extends CircuitElement {
         html.setAttribute('class', this.classes);
         html.setAttribute(this.bodyType, '');
         return html;
+    }
+
+    afisateText() {
+        const html = document.createElement('a-text');
+        html.setAttribute('value', `${this.volt}V`);
+        html.setAttribute('position', `0.5 -0.5 0.3`);
+        html.setAttribute('scale', `1.5 1.5 1.5`);
+        html.setAttribute('align', `center`);
+        html.setAttribute('color', `#FFF`);
+
+        this.htmlElt.appendChild(html);
     }
 }
 
@@ -339,6 +363,8 @@ class Rezistor extends CircuitElement {
             this.resistance = 1;
         else
             this.resistance = +rezistenta.value;
+
+            this.afisateText()
     }
 
     getHtmlElement() {
@@ -354,6 +380,17 @@ class Rezistor extends CircuitElement {
         html.setAttribute('class', this.classes);
         html.setAttribute(this.bodyType, '');
         return html;
+    }
+
+    afisateText() {
+        const html = document.createElement('a-text');
+        html.setAttribute('value', `${this.resistance}oh`);
+        html.setAttribute('position', `0.5 -0.5 0.3`);
+        html.setAttribute('scale', `1.5 1.5 1.5`);
+        html.setAttribute('align', `center`);
+        html.setAttribute('color', `#FFF`);
+
+        this.htmlElt.appendChild(html);
     }
 }
 
@@ -391,6 +428,8 @@ class Ampermetru extends CircuitElement {
 
         this.htmlElt.setAttribute('gltf-model', this.img);
         this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
+
+        this.afisateText();
     }
 
     getHtmlElement() {
@@ -406,6 +445,17 @@ class Ampermetru extends CircuitElement {
         html.setAttribute('class', this.classes);
         html.setAttribute(this.bodyType, '');
         return html;
+    }
+    
+    afisateText() {
+        const html = document.createElement('a-text');
+        html.setAttribute('value', `${this.intensity}A`);
+        html.setAttribute('position', `0.5 -0.5 0.3`);
+        html.setAttribute('scale', `1.5 1.5 1.5`);
+        html.setAttribute('align', `center`);
+        html.setAttribute('color', `#FFF`);
+
+        this.htmlElt.appendChild(html);
     }
 }
 
@@ -419,6 +469,7 @@ class Voltmetru extends CircuitElement {
         this.htmlElt.setAttribute('scale', `${scale} ${scale} ${scale}`);
 
         this.resistance = 999999999;
+        this.afisateText()
     }
 
     getHtmlElement() {
@@ -434,6 +485,17 @@ class Voltmetru extends CircuitElement {
         html.setAttribute('class', this.classes);
         html.setAttribute(this.bodyType, '');
         return html;
+    }
+
+    afisateText() {
+        const html = document.createElement('a-text');
+        html.setAttribute('value', `${this.volt}V`);
+        html.setAttribute('position', `0.5 -0.5 0.3`);
+        html.setAttribute('scale', `1.5 1.5 1.5`);
+        html.setAttribute('align', `center`);
+        html.setAttribute('color', `#FFF`);
+
+        this.htmlElt.appendChild(html);
     }
 }
 

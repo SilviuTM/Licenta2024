@@ -1,6 +1,6 @@
 class Whiteboard {
   constructor() {
-    this.currentShape = 'bec';
+    this.currentShape = 'none';
     this.batteryVoltage = 25;
     this.resistorOhm = 5;
     this.htmlElement = document.getElementById('whiteboard');
@@ -16,6 +16,7 @@ class Whiteboard {
     this.shadowEl = null;
     this.shadowElShape = null;
     this.animationInterval = null;
+    this.animatiiResetate = true;
 
     this.inVR = false;
 
@@ -171,14 +172,8 @@ class Whiteboard {
         this.shadowEl.setAttribute('position', intersection.point);
       }
       else {
-        let intersection = {
-          point: {
-            x: 1,
-            y: 1,
-            z: 10
-          }
-        };
-        this.shadowEl.setAttribute('position', intersection);
+        // behind table
+        this.shadowEl.setAttribute('position', "-0.17 1.7 -1.7");
       }
     }
   }
@@ -186,6 +181,9 @@ class Whiteboard {
   placeShape() {
     if (this.currentShape === 'none')
       return;
+
+    if (this.animatiiResetate === false)
+      this.resetAnimations();
 
     if (this.currentShape === 'delete') {
       this.#handleDelete();
@@ -221,14 +219,18 @@ class Whiteboard {
   }
 
   #handleReceivedData(data) {
+    console.log(data);
     for (let i = 0; i < data.length; i++) {
       for (let j = 0; j < data[i].length; j++) {
         if (data[i][j].letter !== '0') {
           this.grid[i][j].setActive(data[i][j].active);
           //this.grid[i][j].setRotation(data[i][j].rotation);
-          //this.grid[i][j].setIsTurnedOn(data[i][j].isturnedon);
+          //this.grid[i][j].setIsTurnedOn(data[i][j].isTurnedOn);
           this.grid[i][j].currentTo = data[i][j].currentTo;
           this.grid[i][j].currentFrom = data[i][j].currentFrom;
+          this.grid[i][j].volt = data[i][j].voltage;
+          this.grid[i][j].intensity = data[i][j].amplitude;
+          this.grid[i][j].afisateText();
         }
       }
     }
@@ -252,11 +254,14 @@ class Whiteboard {
   }
 
   sendGrid() {
+    this.resetAnimations();
+    this.animatiiResetate = false;
+
     const newGrid = this.grid.map((row) => row.map((cell) => {
       return {
         Letter: cell.gridLetter, Active: cell.active, Voltage: cell.volt,
         Resistance: cell.resistance, Rotation: cell.rotation, IsTurnedOn: cell.isturnedon,
-        currentFrom: cell.currentFrom, currentTo: cell.currentTo
+        currentFrom: [], currentTo: []
       }
     }));
 
@@ -396,6 +401,8 @@ class Whiteboard {
   }
 
   resetAnimations() {
+    this.animatiiResetate = true;
+
     for (let row = 0; row < this.rows; row++)
       for (let col = 0; col < this.cols; col++)
         if (this.grid[row][col].htmlElt) {
