@@ -31,6 +31,94 @@ document.querySelector('a-scene').addEventListener('mousemove', function (evt) {
   // }, 10);
 });
 
+// for importing
+document.getElementById('fileInput').addEventListener('change', function (evt) {
+  const file = evt.target.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      try {
+        const jsonString = e.target.result;
+        const matrix = JSON.parse(jsonString);
+
+        if (Array.isArray(matrix) && matrix.every(Array.isArray)) {
+          console.log('Matrix:', matrix);
+
+          const asceneEL = document.querySelector('a-scene');
+          const board = document.getElementById('whiteboard');
+          const boardWidth = Number.parseFloat(whiteboard.htmlElement.getAttribute('width'));
+          const boardHeight = Number.parseFloat(whiteboard.htmlElement.getAttribute('height'));
+          
+          // reset all
+          for (let i = 0; i < matrix.length; i++)
+            for (let j = 0; j < matrix[i].length; j++) {
+              RemoveIfExists({ parent: asceneEL, child: whiteboard.grid[i][j].htmlElt });
+              whiteboard.grid[i][j] = { gridLetter: '0' };
+            }
+
+          // aici se recreaza grid
+          for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[i].length; j++) {
+              if (matrix[i][j].Letter !== '0') {
+                let curShape = '0';
+
+                if (matrix[i][j].Letter === 'l')
+                  curShape = 'bec';
+                if (matrix[i][j].Letter === 'b')
+                  curShape = 'baterie';
+                if (matrix[i][j].Letter === 's')
+                  curShape = 'intrerupator';
+                if (matrix[i][j].Letter === 'S')
+                  curShape = 'intrerupatorAlt';
+                if (matrix[i][j].Letter === 'r')
+                  curShape = 'rezistor';
+                if (matrix[i][j].Letter === 't')
+                  curShape = 'tranzistor';
+                if (matrix[i][j].Letter === 'a')
+                  curShape = 'amper';
+                if (matrix[i][j].Letter === 'v')
+                  curShape = 'volt';
+                if (matrix[i][j].Letter === 'c')
+                  curShape = 'cablu';
+
+                const shapeEl = CircuitElementFactory.getShape(curShape, {
+                  x: whiteboard.tileSize * j - boardWidth / 2 + board.getAttribute('position').x,
+                  y: -(whiteboard.tileSize * i - boardHeight / 2) + 0.05 + board.getAttribute('position').y,
+                  z: board.getAttribute('position').z
+                }, whiteboard.tileSize, whiteboard.tileSize / boardHeight);
+                console.log(shapeEl, i, j);
+                whiteboard.grid[i][j] = shapeEl;
+                whiteboard.evaluateCablus(i, j);
+                asceneEL.appendChild(shapeEl.htmlElt);
+
+                whiteboard.grid[i][j].gridLetter = matrix[i][j].Letter;
+                whiteboard.grid[i][j].setRotation(matrix[i][j].Rotation);
+                whiteboard.grid[i][j].setIsTurnedOn(matrix[i][j].IsTurnedOn);
+                whiteboard.grid[i][j].volt = matrix[i][j].Voltage;
+                whiteboard.grid[i][j].resistance = matrix[i][j].Resistance;
+                whiteboard.grid[i][j].afisateText();
+              }
+            }
+          }
+
+          whiteboard.circuitValid = true;
+          whiteboard.showHideError();
+        } else {
+          throw new Error('The JSON does not represent a 2D array (matrix).');
+        }
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+      }
+    };
+
+    reader.readAsText(file);
+  } else {
+    console.error('No file selected.');
+  }
+});
+
 AFRAME.registerComponent('force-z-above-0', {
   tick: function () {
     const position = this.el.object3D.position;
@@ -49,6 +137,7 @@ AFRAME.registerComponent('laser-intersection', {
       whiteboard.inVR = true;
 
       document.getElementById('camera').removeChild(document.getElementById('cursor'));
+      document.getElementById('VRMenu').setAttribute('position', "-2 1.7 -0.7");
     });
 
     // And if we're not in VR
@@ -60,7 +149,8 @@ AFRAME.registerComponent('laser-intersection', {
       newHTML.setAttribute('raycaster', 'objects: .clickable, .deletable');
       newHTML.setAttribute('color', '#FFDAE9');
 
-      document.getElementById('camera').appendChild(newHTML);
+      document.getElementById('camera').appendChild(newHTML);      
+      document.getElementById('VRMenu').setAttribute('position', '9999 9999 9999');
     });
 
     // take only first intersected object

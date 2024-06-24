@@ -44,7 +44,7 @@ class Whiteboard {
     el.classList.add('active');
   }
 
-  #evaluateCablus(Y, X) {
+  evaluateCablus(Y, X) {
     this.handleCabluGraphics(Y, X);
     this.handleCabluGraphics(Y + 1, X);
     this.handleCabluGraphics(Y - 1, X);
@@ -84,7 +84,7 @@ class Whiteboard {
       if (this.grid[adjustedGridY][gridX].gridLetter != '0') {
         RemoveIfExists({ parent: sceneEl, child: this.grid[adjustedGridY][gridX].htmlElt });
         this.grid[adjustedGridY][gridX] = { gridLetter: '0' };
-        this.#evaluateCablus(adjustedGridY, gridX);
+        this.evaluateCablus(adjustedGridY, gridX);
       }
     }
   }
@@ -95,7 +95,7 @@ class Whiteboard {
       const { gridX, adjustedGridY } = this.#getGridCoords(intersection);
       if (this.grid[adjustedGridY][gridX].gridLetter != '0') {
         this.grid[adjustedGridY][gridX].setRotation((this.grid[adjustedGridY][gridX].rotation + 90) % 360);
-        this.#evaluateCablus(adjustedGridY, gridX);
+        this.evaluateCablus(adjustedGridY, gridX);
       }
     }
   }
@@ -211,7 +211,7 @@ class Whiteboard {
       if (!!shapeEl) {
         RemoveIfExists({ parent: sceneEl, child: this.grid[adjustedGridY][gridX].htmlElt });
         this.grid[adjustedGridY][gridX] = shapeEl;
-        this.#evaluateCablus(adjustedGridY, gridX);
+        this.evaluateCablus(adjustedGridY, gridX);
         sceneEl.appendChild(shapeEl.htmlElt);
       }
     }
@@ -284,6 +284,35 @@ class Whiteboard {
         this.circuitValid = false;
         this.showHideError();
       });
+  }
+
+  exportGrid() {
+    // creaza continut json si url
+    const newGrid = this.grid.map((row) => row.map((cell) => {
+      return {
+        Letter: cell.gridLetter, Voltage: cell.volt, Resistance: cell.resistance, 
+        Rotation: cell.rotation, IsTurnedOn: cell.isturnedon
+      }}));
+    const jsonString = JSON.stringify(newGrid);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    // element de hyperlink
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sim.json';
+
+    // apasa linkul
+    document.body.appendChild(a);
+    a.click();
+
+    // sterge (este temporar)
+    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
+  importGrid() {
+    document.getElementById('fileInput').click();
   }
 
   handleCabluGraphics(row, col) {
@@ -407,15 +436,20 @@ class Whiteboard {
       for (let col = 0; col < this.cols; col++)
         if (this.grid[row][col].htmlElt) {
           RemoveAllChildren(this.grid[row][col].htmlElt);
-          this.#evaluateCablus(row, col);
+          this.evaluateCablus(row, col);
+          this.grid[row][col].afisateText();
         }
   }
 
   showHideError() {
     var paragraph = document.getElementById('errorCircuit');
-    if (this.circuitValid == true)
+    if (this.circuitValid == true) {
       paragraph.style.display = 'none';
-    else
+      document.getElementById('VRCInv').setAttribute('position', "0 -0.65 -0.001");
+    }
+    else {
       paragraph.style.display = 'block';
+      document.getElementById('VRCInv').setAttribute('position', "0 -0.65 0.001");
+    }
   }
 }

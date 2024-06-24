@@ -41,6 +41,9 @@
     <p class="textLabel">-- Simulare --</p>
     <button class="ui-container-btn" onclick="whiteboard.sendGrid()">Simuleaza</button>
     <button class="ui-container-btn" onclick="whiteboard.resetAnimations()">Reseteaza Animatii</button>
+    <button class="ui-container-btn" id="exportButton" onclick="whiteboard.exportGrid()">Export</button>
+    <button class="ui-container-btn" id="importButton" onclick="whiteboard.importGrid()">Import</button>
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
     <p class="textLabel" style="color: red;display: none;" id="errorCircuit">Circuit invalid!</p>
 
   </div>
@@ -83,7 +86,7 @@
     <!-- VR Stuff -->
     <a-entity id="hand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
 
-    <a-plane id="VRMenu" position="-2 1.7 -0.7" rotation="0 60 0" width="0.75" height="1.4" src="#vrCompBG">
+    <a-plane id="VRMenu" position="9999 9999 9999" rotation="0 60 0" width="0.75" height="1.4" src="#vrCompBG">
       <a-text value="-- Componente --" position="0 0.65 0.001" scale="0.25 0.25 0.25" color="#000" align="center"></a-text>
 
       <!-- rand 1 -->
@@ -150,6 +153,9 @@
       <a-plane class="clickable" id="VRres" position="0.17 -0.57 0.001" width="0.35" height="0.08" color="#AAAAAA">
         <a-text value="Reseteaza Animatii" position="0 0 0.001" scale="0.18 0.18 0.18" color="#000" align="center"></a-text>
       </a-plane>
+
+      <!-- rand 5 -->
+      <a-text value="Circuit invalid!" position="0 -0.65 -0.001" scale="0.25 0.25 0.25" color="red" align="center" id="VRCInv"></a-text>
     </a-plane>
 
     <!-- Whiteboard -->
@@ -165,20 +171,6 @@
     <!-- Lights -->
     <a-light type="ambient" color="#445451"></a-light>
     <a-light type="directional" color="#ffffff" position="0 0.5 1"></a-light>
-
-
-    <!-- I am going to use this later, once all models are in
-      <a-light type="point" color="#445451" position="0 2 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="-1 2 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="1 2 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="0 1 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="-1 1 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="1 1 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="0 3 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="-1 3 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="1 3 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="2 3 1" intensity="2"></a-light>
-      <a-light type="point" color="#445451" position="-2 3 1" intensity="2"></a-light> -->
   </a-scene>
   <script src="simulation.js"></script>
 </body>
