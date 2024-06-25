@@ -7,50 +7,6 @@ namespace Licenta
     {
         public CircuitElement[][] circuit;
 
-        public void CheckIfCircuitValid(char cameFrom, int row, int col, bool hasResistance)
-        {
-            CircuitElement curEl = circuit[row][col];
-            char curLet = curEl.Letter;
-
-            // if we landed on nothing, stop this trail
-            if (curLet == '0') return;
-
-            // if we came from valid direction, keep going, otherwise stop
-            // this applies for switch, light, rezistor, amper, volt, watt, ohm meters and battery
-            if (curLet == 's' || curLet == 'l' || curLet == 'r' || curLet == 'a' || curLet == 'v' || curLet == 'w' || curLet == 'o' || curLet == 'b')
-                if (!CameFromValidDirection2T(cameFrom, curEl.Rotation / 90))
-                    return;
-
-            // this applies for battery, if here and we have resistance, good. otherwise this circuit is invalid
-            if (curLet == 'b')
-            {
-                if (!hasResistance)
-                    INVALID_CIRCUIT = true;
-
-                return;
-            }
-
-            bool ok = false;
-            if (curLet != 'c')
-                ok = true;
-
-            // add where we came from
-            if (!cameFroms.ContainsKey((row, col))) cameFroms.Add((row, col), "");
-            cameFroms[(row, col)] += cameFrom;
-
-            // if we came from the same place twice, then the circuit is invalid
-            if (cameFroms[(row, col)].Count(x => x == 'N') > 1 ||
-                cameFroms[(row, col)].Count(x => x == 'S') > 1 ||
-                cameFroms[(row, col)].Count(x => x == 'E') > 1 ||
-                cameFroms[(row, col)].Count(x => x == 'W') > 1)
-                INVALID_CIRCUIT = true;
-
-            if (row > 0 && cameFrom != 'N') CheckIfCircuitValid('S', row - 1, col, hasResistance || ok);
-            if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') CheckIfCircuitValid('N', row + 1, col, hasResistance || ok);
-            if (col > 0 && cameFrom != 'W') CheckIfCircuitValid('E', row, col - 1, hasResistance || ok);
-            if (col < circuit[row].Length - 1 && cameFrom != 'E') CheckIfCircuitValid('W', row, col + 1, hasResistance || ok);
-        }
-
         /// V = I * R
         /// P = V * I
         /// 
@@ -84,19 +40,11 @@ namespace Licenta
 
         /// ASSUME ALL CURRENTS CLOCKWISE
 
-        /// tranzistori poate. dupa prima simulare, se verifica tranzistorii si daca au destul voltaj, se reruleaza simularea cu ei deschisi
-
         // this stores the positions and each char in string is a direction we came from
         Dictionary<(int row, int col), string> cameFroms;
 
         // this stores if the circuit is invalid
         public bool INVALID_CIRCUIT;
-
-        // this stores the positions and each char in the string is another path that can be taken
-        // when we first get here, we write down all other possible paths
-        // when we return here, we take out the direction we just came from
-        // when only 1 char is left, that is the path to keep going
-        Dictionary<(int row, int col), string> intersections;
 
         int[,] visited;
         List<WireNode> nodes;
@@ -108,7 +56,6 @@ namespace Licenta
             circuit = circ;
 
             cameFroms = new();
-            intersections = new();
             INVALID_CIRCUIT = false;
 
             visited = new int[circuit.GetLength(0), circuit[0].Length];
@@ -118,143 +65,6 @@ namespace Licenta
 
             componentDict = [];
         }
-
-        public CircuitElement[][] Simulate()
-        {
-            for (int row = 0; row < circuit.GetLength(0); row++)
-                for (int col = 0; col < circuit[row].Length; col++)
-                    if (circuit[row][col].Letter == 'b')
-                    {
-                        // check if valid
-                        int rotation = circuit[row][col].Rotation / 90;
-                        //circuit[row][col].Active = true;
-
-                        if (row > 0 && rotation == 0) TraverseGeneral('S', row - 1, col);
-                        if (row < circuit.GetLength(0) - 1 && rotation == 2) TraverseGeneral('N', row + 1, col);
-                        if (col > 0 && rotation == 1) TraverseGeneral('E', row, col - 1);
-                        if (col < circuit[row].Length - 1 && rotation == 3) TraverseGeneral('W', row, col + 1);
-
-                        // if valid then simulate
-                        TraverseFromBattery(row, col);
-                    }
-
-            return circuit;
-        }
-
-        public void TraverseFromBattery(int row, int col)
-        {
-            int rotation = circuit[row][col].Rotation / 90;
-            //circuit[row][col].Active = true;
-
-            if (row > 0 && rotation == 0) TraverseGeneral('S', row - 1, col);
-            if (row < circuit.GetLength(0) - 1 && rotation == 2) TraverseGeneral('N', row + 1, col);
-            if (col > 0 && rotation == 1) TraverseGeneral('E', row, col - 1);
-            if (col < circuit[row].Length - 1 && rotation == 3) TraverseGeneral('W', row, col + 1);
-        }
-
-        public void TraverseGeneral(char cameFrom, int row, int col)
-        {
-            CircuitElement curEl = circuit[row][col];
-            char curLet = curEl.Letter;
-
-            // if we landed on nothing, stop this trail
-            if (curLet == '0') return;
-
-            // if we came from valid direction, keep going, otherwise stop
-            // this applies for switch, light, rezistor, amper, volt, watt, ohm meters
-            if (curLet == 's' || curLet == 'l' || curLet == 'r' || curLet == 'a' || curLet == 'v' || curLet == 'w' || curLet == 'o')
-                if (!CameFromValidDirection2T(cameFrom, curEl.Rotation / 90))
-                    return;
-
-            if (curLet == 'l') HandleLightbulb(cameFrom, row, col);
-
-            else if (curLet == 'b') return; // battery does nothing when you go in it again
-
-            else if (curLet == 's') HandleSwitch(cameFrom, row, col);
-
-            else if (curLet == 'c')
-            {
-                //circuit[row][col].Active = true;
-
-                if (row > 0 && cameFrom != 'N') TraverseGeneral('S', row - 1, col);
-                if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') TraverseGeneral('N', row + 1, col);
-                if (col > 0 && cameFrom != 'W') TraverseGeneral('E', row, col - 1);
-                if (col < circuit[row].Length - 1 && cameFrom != 'E') TraverseGeneral('W', row, col + 1);
-            }
-
-            else throw new Exception("unsupported letter");
-        }
-
-        public void HandleLightbulb(char cameFrom, int row, int col)
-        {
-            if (CameFromValidDirection2T(cameFrom, circuit[row][col].Rotation / 90) == false) return;
-
-            //circuit[row][col].Active = true;
-
-            if (cameFrom == 'N' && row < circuit.GetLength(0) - 1) TraverseGeneral('N', row + 1, col);
-            if (cameFrom == 'S' && row > 0) TraverseGeneral('S', row - 1, col);
-            if (cameFrom == 'W' && col < circuit[row].Length - 1) TraverseGeneral('W', row, col + 1);
-            if (cameFrom == 'E' && col > 0) TraverseGeneral('S', row, col - 1);
-        }
-
-        public void HandleSwitch(char cameFrom, int row, int col)
-        {
-            if (CameFromValidDirection2T(cameFrom, circuit[row][col].Rotation / 90) == false) return;
-
-            if (circuit[row][col].IsTurnedOn)
-            {
-                //circuit[row][col].Active = true;
-
-                if (cameFrom == 'N' && row < circuit.GetLength(0) - 1) TraverseGeneral('N', row + 1, col);
-                if (cameFrom == 'S' && row > 0) TraverseGeneral('S', row - 1, col);
-                if (cameFrom == 'W' && col < circuit[row].Length - 1) TraverseGeneral('W', row, col + 1);
-                if (cameFrom == 'E' && col > 0) TraverseGeneral('S', row, col - 1);
-            }
-            else return;
-        }
-
-        public bool CameFromValidDirection2T(char cameFrom, int rotation)
-        {
-            if ((rotation == 0 || rotation == 2) && (cameFrom == 'N' || cameFrom == 'S'))
-                return true;
-
-            if ((rotation == 1 || rotation == 3) && (cameFrom == 'E' || cameFrom == 'W'))
-                return true;
-
-            return false;
-        }
-
-        // worse rewrites
-        public bool CheckValidDirection(int row, int col)
-        {
-            return false;
-        }
-
-        public void ChooseTraverse(char cameFrom, int row, int col)
-        {
-            if (visited[row, col] == 1) return;
-            visited[row, col] = 1;
-
-            // wip
-        }
-
-        public void TraverseFromWire(char cameFrom, int row, int col)
-        {
-            if (row > 0 && cameFrom != 'N') TraverseGeneral('S', row - 1, col);
-            if (row < circuit.GetLength(0) - 1 && cameFrom != 'S') TraverseGeneral('N', row + 1, col);
-            if (col > 0 && cameFrom != 'W') TraverseGeneral('E', row, col - 1);
-            if (col < circuit[row].Length - 1 && cameFrom != 'E') TraverseGeneral('W', row, col + 1);
-        }
-
-        public void TraverseFrom2T(char cameFrom, int row, int col)
-        {
-            if (cameFrom == 'N' && row < circuit.GetLength(0) - 1) ChooseTraverse('N', row + 1, col);
-            if (cameFrom == 'S' && row > 0) ChooseTraverse('S', row - 1, col);
-            if (cameFrom == 'W' && col < circuit[row].Length - 1) ChooseTraverse('W', row, col + 1);
-            if (cameFrom == 'E' && col > 0) ChooseTraverse('S', row, col - 1);
-        }
-
-
 
         /// PILLAR 1: COMPUTE GRAPH 
 
@@ -322,19 +132,6 @@ namespace Licenta
                     return true;
 
             return false;
-        }
-
-        // Get next from any
-        public List<(int row, int col, char from)> GetNextFromAny(int row, int col, char cameFrom)
-        {
-            if (circuit[row][col].Letter == 'c')
-                return GetNextFromWire(row, col, cameFrom);
-
-            if (circuit[row][col].Letter == 'S')
-                return [GetNextFromSwitchAlt(row, col, cameFrom)];
-
-            var aux = GetNextFrom2T(row, col, cameFrom);
-            return [(aux.row, aux.col, cameFrom)];
         }
 
         // Get next from 2T
@@ -1063,17 +860,6 @@ namespace Licenta
 
             // Return new move
             return newMove;
-        }
-
-        public void CleanUp()
-        {
-            // see if this is required actually (by testing with stray branches and check their intensity)
-
-            // e posibil ca am sa fie 0 atunci cand avem nod cu fir care are rezistenta 0 in paralel, vezi caz
-
-            // check all branches in all nodes
-            // if they have no end (that has resistance) then they're useless remove them and set their amplitude to 0
-            // then repeat checking
         }
 
         public class Atom { }

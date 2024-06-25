@@ -1,6 +1,3 @@
-using Licenta.Models;
-using Microsoft.EntityFrameworkCore;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -27,8 +24,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 builder.Services.AddControllers();
 
 /// BUILD APP
@@ -46,8 +41,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
-
-//app.UseAuthentication();
 
 app.UseEndpoints(endpoints =>
 {

@@ -227,7 +227,9 @@ class Whiteboard {
           //this.grid[i][j].setRotation(data[i][j].rotation);
           //this.grid[i][j].setIsTurnedOn(data[i][j].isTurnedOn);
           this.grid[i][j].currentTo = data[i][j].currentTo;
-          this.grid[i][j].currentFrom = data[i][j].currentFrom;
+          if (this.grid[i][j].gridLetter !== 's' || this.grid[i][j].isturnedon === true)
+            this.grid[i][j].currentFrom = data[i][j].currentFrom;
+          else this.grid[i][j].currentFrom = [];
           this.grid[i][j].volt = data[i][j].voltage;
           this.grid[i][j].intensity = data[i][j].amplitude;
           this.grid[i][j].afisateText();
@@ -290,9 +292,10 @@ class Whiteboard {
     // creaza continut json si url
     const newGrid = this.grid.map((row) => row.map((cell) => {
       return {
-        Letter: cell.gridLetter, Voltage: cell.volt, Resistance: cell.resistance, 
+        Letter: cell.gridLetter, Voltage: cell.volt, Resistance: cell.resistance,
         Rotation: cell.rotation, IsTurnedOn: cell.isturnedon
-      }}));
+      }
+    }));
     const jsonString = JSON.stringify(newGrid);
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -437,7 +440,7 @@ class Whiteboard {
         if (this.grid[row][col].htmlElt) {
           RemoveAllChildren(this.grid[row][col].htmlElt);
           this.evaluateCablus(row, col);
-          this.grid[row][col].afisateText();
+          //this.grid[row][col].afisateText();
         }
   }
 
